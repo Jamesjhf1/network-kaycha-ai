@@ -2,16 +2,15 @@ import { useState } from 'react'
 import { PhysicalView } from './views/PhysicalView'
 import { LogicalView } from './views/LogicalView'
 import { PowerView } from './views/PowerView'
-import { ShoppingView } from './views/ShoppingView'
+
 import { FooterStats } from './components/FooterStats'
 
-type Tab = 'physical' | 'logical' | 'power' | 'shopping'
+type Tab = 'physical' | 'logical' | 'power'
 
 const tabs: { id: Tab; label: string; icon: string }[] = [
   { id: 'physical', label: 'Physical', icon: '⬡' },
   { id: 'logical', label: 'Logical', icon: '◈' },
   { id: 'power', label: 'Power', icon: '⚡' },
-  { id: 'shopping', label: 'Shopping', icon: '◉' },
 ]
 
 export default function App() {
@@ -54,7 +53,7 @@ export default function App() {
           {activeTab === 'physical' && <PhysicalView />}
           {activeTab === 'logical' && <LogicalView />}
           {activeTab === 'power' && <PowerView />}
-          {activeTab === 'shopping' && <ShoppingView />}
+
         </div>
       </main>
 

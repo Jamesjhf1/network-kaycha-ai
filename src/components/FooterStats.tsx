@@ -5,13 +5,12 @@ export function FooterStats() {
     { label: 'LAN Core', value: '10G/2.5G', color: '#38bdf8' },
     { label: 'Total RAM', value: '704 GB', color: '#00d4ff' },
     { label: 'GPU Count', value: '5 GPUs', color: '#f472b6' },
-    { label: 'Upgrade Cost', value: '$14,295', color: '#a78bfa' },
   ]
 
   return (
     <footer className="border-t border-border bg-panel/90 backdrop-blur-sm">
       <div className="px-6 py-3">
-        <div className="grid grid-cols-6 gap-3">
+        <div className="grid grid-cols-5 gap-3">
           {stats.map((s) => (
             <div
               key={s.label}
