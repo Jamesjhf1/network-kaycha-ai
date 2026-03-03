@@ -1,0 +1,192 @@
+const C = {
+  warning: '#f59e0b',
+  purple: '#a78bfa',
+  pink: '#f472b6',
+  green100g: '#34d399',
+  cyan10g: '#38bdf8',
+  accent: '#00d4ff',
+  red: '#ef4444',
+  textDim: '#94a3b8',
+  textBright: '#e2e8f0',
+  panel: '#111827',
+  border: '#1e293b',
+  bg: '#0a0e17',
+}
+
+function Section({ title, color, children, className = '' }: {
+  title: string; color: string; children: React.ReactNode; className?: string
+}) {
+  return (
+    <div className={`rounded-lg border p-4 ${className}`} style={{ borderColor: color + '40', background: C.panel }}>
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-2 h-2 rounded-full" style={{ background: color }} />
+        <span className="text-xs font-semibold tracking-wider uppercase" style={{ color }}>{title}</span>
+      </div>
+      {children}
+    </div>
+  )
+}
+
+function ServiceCard({ name, details, color }: { name: string; details: string[]; color: string }) {
+  return (
+    <div className="rounded border p-3 mb-2" style={{ borderColor: C.border, background: C.bg }}>
+      <div className="text-xs font-semibold mb-1" style={{ color }}>{name}</div>
+      {details.map((d, i) => (
+        <div key={i} className="text-[10px] leading-relaxed" style={{ color: C.textDim }}>{d}</div>
+      ))}
+    </div>
+  )
+}
+
+export function LogicalView() {
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      {/* LEFT: VLAN 10 - AI Fabric */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2 px-2">
+          <div className="w-3 h-3 rounded-full" style={{ background: C.green100g }} />
+          <span className="text-sm font-bold tracking-wider" style={{ color: C.green100g }}>VLAN 10 — 100GbE AI FABRIC</span>
+        </div>
+        <div className="text-[10px] px-2 -mt-1" style={{ color: C.textDim }}>SN2100 • ConnectX-5 VPI • RoCEv2 RDMA • 10.0.100.0/24</div>
+
+        <Section title="IRONMAN — Primary Compute" color={C.warning}>
+          <ServiceCard name="Open WebUI :3000 (Primary)" color={C.warning} details={[
+            'Hosts main Open WebUI instance',
+            'Multi-endpoint config → all 3 Ollama nodes',
+          ]} />
+          <ServiceCard name="Ollama :11434" color={C.warning} details={[
+            'Qwen3 72B / Llama 405B-Q4 (large models)',
+            '192GB VRAM (2× RTX PRO 6000)',
+            'ConnectX-5 100GbE • 10.0.100.10',
+          ]} />
+          <ServiceCard name="Parsec Host" color={C.accent} details={[
+            'GPU-accelerated remote desktop',
+            'Near-native latency via RDMA fabric',
+          ]} />
+        </Section>
+
+        <Section title="JARVIS2 — Worker Node" color={C.purple}>
+          <ServiceCard name="Ollama Worker :11434" color={C.purple} details={[
+            'Qwen3 32B / CodeLlama 34B',
+            '96GB VRAM (RTX PRO 6000)',
+            'ConnectX-5 100GbE • 10.0.100.20',
+          ]} />
+        </Section>
+
+        <Section title="JARVIS3 — Worker Node" color={C.purple}>
+          <ServiceCard name="Docker Host + Ollama Worker :11434" color={C.purple} details={[
+            'Open WebUI / JARVIS-OPS containers',
+            'Qwen3 32B / Mistral / embed models',
+            '96GB VRAM (RTX PRO 6000)',
+            'ConnectX-5 100GbE • 10.0.100.30',
+            'Auto-start configured',
+          ]} />
+        </Section>
+
+        <Section title="SN2100 Switch" color={C.green100g}>
+          <div className="text-[10px]" style={{ color: C.textDim }}>
+            <p>16× QSFP28 ports • 3.2 Tb/s switching capacity</p>
+            <p className="mt-1">3 active ports → Ironman, J2, J3</p>
+            <p className="mt-1 font-semibold" style={{ color: C.green100g }}>RoCEv2 enabled — zero-copy RDMA for model weights</p>
+          </div>
+        </Section>
+
+        <Section title="Open WebUI Multi-Endpoint Config" color={C.accent}>
+          <div className="space-y-1 text-[10px]" style={{ color: C.textDim }}>
+            <p><span style={{ color: C.warning }}>●</span> Ironman: http://10.0.100.10:11434 (primary)</p>
+            <p><span style={{ color: C.purple }}>●</span> Jarvis2: http://10.0.100.20:11434 (worker)</p>
+            <p><span style={{ color: C.purple }}>●</span> Jarvis3: http://10.0.100.30:11434 (worker)</p>
+            <p className="mt-2 font-semibold" style={{ color: C.accent }}>Load balancing across 384GB VRAM fabric</p>
+          </div>
+        </Section>
+
+        <Section title="Dev Tools" color={C.accent}>
+          <div className="grid grid-cols-2 gap-1 text-[10px]" style={{ color: C.textDim }}>
+            {['Cursor IDE', 'Claude Desktop + 21 MCP', 'Open WebUI', 'bolt.diy', 'VS Code', 'Claude Code CLI'].map(t => (
+              <div key={t} className="flex items-center gap-1">
+                <span style={{ color: C.accent }}>▸</span> {t}
+              </div>
+            ))}
+          </div>
+        </Section>
+
+        <Section title="WinRM Mesh" color={C.warning}>
+          <div className="text-[10px]" style={{ color: C.textDim }}>
+            <p>Credentials: jarvis / 2Quick4u • Basic Auth</p>
+            <p className="mt-1">PowerShell remoting across all 4 nodes</p>
+          </div>
+        </Section>
+      </div>
+
+      {/* RIGHT: VLAN 20 - General LAN */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2 px-2">
+          <div className="w-3 h-3 rounded-full" style={{ background: C.cyan10g }} />
+          <span className="text-sm font-bold tracking-wider" style={{ color: C.cyan10g }}>VLAN 20 — GENERAL LAN</span>
+        </div>
+        <div className="text-[10px] px-2 -mt-1" style={{ color: C.textDim }}>MS510TXUP 10G/2.5G → GS752TPv2 PoE Edge • 192.168.1.0/24</div>
+
+        <Section title="JARVIS (JAMES-AI)" color={C.pink}>
+          <ServiceCard name="AI Workstation" color={C.pink} details={[
+            'RTX 5090 32GB VRAM',
+            '192GB DDR5 RAM',
+            'AMD Ryzen 9 9950X3D 16C/32T',
+            'Realtek 2.5GbE → MS510TXUP',
+            'Wi-Fi 6E (Tailscale backup)',
+            'Role: AI workstation, gaming, dev',
+          ]} />
+        </Section>
+
+        <Section title="Cloud & Remote Services" color={C.red}>
+          <div className="grid grid-cols-2 gap-2">
+            <ServiceCard name="Supabase" color={C.green100g} details={['6 projects', 'PostgreSQL + Edge Functions', 'Auth + Realtime']} />
+            <ServiceCard name="Cloudflare" color={C.warning} details={['12 zones', 'Workers + D1', 'DNS + CDN']} />
+            <ServiceCard name="Netlify" color={C.cyan10g} details={['6 sites', 'Serverless Functions', 'CI/CD deploys']} />
+            <ServiceCard name="GitHub" color={C.textBright} details={['Kaycha-Labs org', 'Jamesjhf1 personal', 'Actions CI']} />
+            <ServiceCard name="Colo Server" color={C.purple} details={['Revelex Boca VPN .24', 'Dell R760xa', '2× L40S GPUs (.25)']} />
+          </div>
+        </Section>
+
+        {/* VRAM Budget */}
+        <Section title="VRAM Budget" color={C.warning}>
+          <div className="space-y-2">
+            {[
+              { name: 'Ironman', vram: 192, color: C.warning, net: '100GbE' },
+              { name: 'Jarvis2', vram: 96, color: C.purple, net: '100GbE' },
+              { name: 'Jarvis3', vram: 96, color: C.purple, net: '100GbE' },
+              { name: 'Jarvis', vram: 32, color: C.pink, net: '2.5GbE' },
+            ].map(m => (
+              <div key={m.name} className="flex items-center gap-2">
+                <span className="text-[10px] w-16 font-semibold" style={{ color: m.color }}>{m.name}</span>
+                <div className="flex-1 h-4 rounded overflow-hidden" style={{ background: C.border }}>
+                  <div className="h-full rounded" style={{ width: `${(m.vram / 192) * 100}%`, background: m.color + '80' }} />
+                </div>
+                <span className="text-[10px] w-16 text-right" style={{ color: C.textDim }}>{m.vram}GB</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded" style={{
+                  color: m.net === '100GbE' ? C.green100g : C.cyan10g,
+                  background: (m.net === '100GbE' ? C.green100g : C.cyan10g) + '15',
+                }}>{m.net}</span>
+              </div>
+            ))}
+            <div className="flex items-center justify-between pt-2 border-t" style={{ borderColor: C.border }}>
+              <span className="text-[10px] font-bold" style={{ color: C.warning }}>TOTAL</span>
+              <span className="text-xs font-bold" style={{ color: C.warning }}>416GB VRAM</span>
+            </div>
+            <div className="text-[10px]" style={{ color: C.green100g }}>
+              384GB on 100GbE fabric • 32GB on 2.5GbE LAN
+            </div>
+          </div>
+        </Section>
+
+        {/* PoE Edge */}
+        <Section title="PoE Edge — GS752TPv2" color={C.textDim}>
+          <div className="text-[10px]" style={{ color: C.textDim }}>
+            <p>48× 1GbE PoE+ ports + 4× SFP</p>
+            <p className="mt-1">Cascaded via 1G SFP from MS510TXUP</p>
+            <p className="mt-1">Devices: APs, cameras, IoT, smart lab equipment</p>
+          </div>
+        </Section>
+      </div>
+    </div>
+  )
+}
