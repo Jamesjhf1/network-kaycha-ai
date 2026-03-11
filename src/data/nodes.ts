@@ -21,6 +21,13 @@ export interface ServiceEntry {
   detail?: string
 }
 
+export interface PortEntry {
+  port: string
+  speed: string
+  device: string
+  notes: string
+}
+
 export interface NodeData {
   id: string
   name: string
@@ -33,6 +40,7 @@ export interface NodeData {
   interfaces: NetInterface[]
   services: ServiceEntry[]
   notes?: string[]
+  ports?: PortEntry[]
 }
 
 export const NODES: Record<string, NodeData> = {
@@ -167,7 +175,7 @@ export const NODES: Record<string, NodeData> = {
     name: 'JERICHO',
     badge: '100G+2.5G',
     status: 'online',
-    role: 'Primary Dev Workstation (Jeremy)',
+    role: 'Primary Dev Workstation',
     colorKey: 'purple',
     hardware: [
       'CPU: Intel Ultra 9 285K',
@@ -207,7 +215,7 @@ export const NODES: Record<string, NodeData> = {
     name: 'WAR-MACHINE',
     badge: 'BUILDING',
     status: 'building',
-    role: "Jeremy's Dev Workstation",
+    role: "Jeremy's Dev Workstation (Remote)",
     colorKey: 'blue',
     hardware: [
       'CPU: AMD Ryzen 9 9950X',
@@ -221,7 +229,7 @@ export const NODES: Record<string, NodeData> = {
       { name: 'Ollama', category: 'ai', detail: 'Local inference — secondary to JARVIS colo', port: '11434' },
     ],
     interfaces: [
-      { label: '2.5GbE NIC', speed: '2.5GbE', target: 'Netgear MS510TXUP', color: 'lan' },
+      { label: 'Edge4 VPN', speed: 'VPN', target: 'ER4 Gateway → MS510TXUP Port 2', color: 'wan' },
       { label: 'Tailscale', speed: 'WireGuard', target: 'Mesh VPN', color: 'tailscale' },
       { label: 'JARVIS Colo (SSH tunnel)', speed: 'VPN tunnel', target: '4× L40S GPU inference server', color: 'wan' },
     ],
@@ -230,6 +238,7 @@ export const NODES: Record<string, NodeData> = {
       { name: 'JARVIS Colo Access', detail: 'SSH tunnel to 4× L40S 48GB for heavy inference (port 11434 → VPN tunnel)' },
     ],
     notes: [
+      'Remote machine — connects to lab via ER4 VPN gateway',
       'RAM arriving Wed Mar 11 → shipping to Jeremy Thu Mar 12',
       'Windows username: Jeremy',
     ],
@@ -365,5 +374,42 @@ export const NODES: Record<string, NodeData> = {
       { name: 'Web Stack', detail: 'Staging — mirrors production for pre-deploy testing' },
     ],
     notes: [],
+  },
+
+  ms510txup: {
+    id: 'ms510txup',
+    name: 'MS510TXUP',
+    badge: '10G LAN CORE',
+    status: 'online',
+    role: 'Netgear MS510TXUP — 10G/Multi-Gig Managed Switch',
+    colorKey: 'cyan10g',
+    hardware: [
+      'Model: Netgear MS510TXUP',
+      '4× 10G copper + 4× 2.5G copper + 2× SFP+ 10G',
+      'PoE+ on 2.5G ports (295W budget)',
+      'VLAN capable • Link aggregation • QoS',
+    ],
+    apps: [],
+    interfaces: [
+      { label: 'Uplink to GS752TPv2', speed: '1G SFP', target: 'PoE Edge switch (Cat6)', color: 'lan' },
+    ],
+    services: [],
+    notes: [
+      'Core switch for all local compute nodes',
+      'Port 4 → GS752TPv2 links at 1G despite Cat6 (expected)',
+      'ER4 on port 2 provides VPN gateway for WAR-MACHINE + remote sites',
+    ],
+    ports: [
+      { port: '1', speed: '2.5G', device: 'HAPPY (10.2.10.112)', notes: 'Test runner' },
+      { port: '2', speed: '2.5G', device: 'ER4', notes: 'VPN gateway → WAR-MACHINE + remote sites' },
+      { port: '3', speed: '2.5G', device: 'Phone', notes: 'PoE powered' },
+      { port: '4', speed: '2.5G', device: '→ GS752TPv2 uplink', notes: 'Cat6, links at 1G' },
+      { port: '5', speed: '10G', device: 'SENTINEL (10.2.10.70)', notes: 'Primary inference, RTX 5090' },
+      { port: '6', speed: '10G', device: 'IRON-PATRIOT (10.2.10.71)', notes: 'Docker/monitoring, RTX PRO 6000' },
+      { port: '7', speed: '10G', device: 'JERICHO (10.2.10.35)', notes: 'Primary dev, RTX PRO 6000' },
+      { port: '8', speed: '10G', device: 'IRONMAN (TBD)', notes: 'Threadripper PRO — future primary' },
+      { port: '9 (SFP+)', speed: '10G', device: 'Spare', notes: 'Future 10G uplink or inter-switch' },
+      { port: '10 (SFP+)', speed: '10G', device: 'Spare', notes: 'Future expansion' },
+    ],
   },
 }

@@ -62,16 +62,27 @@ function DeviceCard({ x, y, w, h, label, badge, color, specs, selected, onClick 
   )
 }
 
-function SwitchCard({ x, y, w, h, label, badge, color, ports, activeCount, totalCount }: {
+function SwitchCard({ x, y, w, h, label, badge, color, ports, activeCount, totalCount, selected, onClick }: {
   x: number; y: number; w: number; h: number; label: string; badge: string; color: string
   ports: number; activeCount: number; totalCount: number
+  selected?: boolean; onClick?: () => void
 }) {
   const portW = 8, portH = 6, gap = 3
   const totalW = totalCount * (portW + gap) - gap
   const startX = x + (w - totalW) / 2
   return (
-    <g>
-      <rect x={x} y={y} width={w} height={h} rx={6} fill={C.panel} stroke={color + '60'} strokeWidth={1.5} />
+    <g onClick={onClick} style={onClick ? { cursor: 'pointer' } : undefined}>
+      {selected && (
+        <rect x={x - 3} y={y - 3} width={w + 6} height={h + 6} rx={9}
+          fill="none" stroke={color} strokeWidth={1.5} opacity={0.3}
+        />
+      )}
+      <rect x={x} y={y} width={w} height={h} rx={6}
+        fill={selected ? color + '12' : C.panel}
+        stroke={selected ? color : color + '60'}
+        strokeWidth={selected ? 2 : 1.5}
+        filter={selected ? `drop-shadow(0 0 14px ${color}50)` : undefined}
+      />
       <rect x={x + 8} y={y + 4} width={badge.length * 7 + 12} height={16} rx={3} fill={color + '20'} stroke={color + '40'} strokeWidth={0.5} />
       <text x={x + 14} y={y + 15} fontSize={8} fontWeight={600} fill={color} fontFamily="'JetBrains Mono'">{badge}</text>
       <text x={x + w / 2} y={y + 36} textAnchor="middle" fontSize={10} fontWeight={600} fill={C.textBright} fontFamily="'JetBrains Mono'">{label}</text>
@@ -81,6 +92,15 @@ function SwitchCard({ x, y, w, h, label, badge, color, ports, activeCount, total
         />
       ))}
       <text x={x + w / 2} y={y + h - 4} textAnchor="middle" fontSize={7} fill={C.textDim} fontFamily="'JetBrains Mono'">{activeCount}/{ports} active</text>
+      {/* Clickable hint */}
+      {onClick && !selected && (
+        <g>
+          <rect x={x + w - 55} y={y + 4} width={47} height={14} rx={3}
+            fill={color + '15'} stroke={color + '30'} strokeWidth={0.5}
+          />
+          <text x={x + w - 31} y={y + 14} textAnchor="middle" fontSize={7} fill={color + 'aa'} fontFamily="'JetBrains Mono'">ports ›</text>
+        </g>
+      )}
     </g>
   )
 }
@@ -113,7 +133,7 @@ export function PhysicalView() {
   const openModal = (id: string) => setActiveModal(id)
   const closeModal = () => setActiveModal(null)
 
-  const svgW = 1200, svgH = 1340
+  const svgW = 1200, svgH = 1410
 
   const card = (nodeId: string, x: number, y: number, w: number, h: number, specs: string[]) => {
     const node = NODES[nodeId]
@@ -186,7 +206,8 @@ export function PhysicalView() {
           <SwitchCard x={60} y={400} w={300} h={80} label="Mellanox SN2100" badge="100GbE AI FABRIC"
             color={C.green100g} ports={16} activeCount={3} totalCount={16} />
           <SwitchCard x={440} y={400} w={300} h={80} label="Netgear MS510TXUP" badge="10G LAN CORE"
-            color={C.cyan10g} ports={10} activeCount={8} totalCount={10} />
+            color={C.cyan10g} ports={10} activeCount={8} totalCount={10}
+            selected={activeModal === 'ms510txup'} onClick={() => openModal('ms510txup')} />
           <SwitchCard x={830} y={400} w={310} h={80} label="Netgear GS752TPv2" badge="PoE EDGE"
             color={C.textDim} ports={52} activeCount={12} totalCount={16} />
 
@@ -241,33 +262,46 @@ export function PhysicalView() {
             ADDITIONAL NODES (LAN CONNECTED)
           </text>
 
-          {card('warmachine', 160, 735, 380, 100, [
-            'CPU: AMD Ryzen 9 9950X  •  Owner: Jeremy',
-            'RAM: 128GB DDR5 (arrives Mar 11)',
-            'GPU: RTX 5080 16GB  •  NIC: 2.5GbE → MS510',
-            'Role: Dev workstation, secondary inference',
-          ])}
+          <ConnectionLine x1={590} y1={480} x2={400} y2={735} color={C.cyan10g} dashed />
+          <SpeedBadge x={480} y={710} label="2.5G" color={C.cyan10g} />
 
-          {card('happy', 660, 735, 380, 100, [
+          {card('happy', 200, 735, 380, 100, [
             'Home Desktop',
             'NIC: 2.5GbE → MS510  •  Role: NSSM test services',
             '10.2.10.112 • TS: 100.87.48.124',
           ])}
 
-          {/* === WAN / VPN === */}
-          <ConnectionLine x1={600} y1={840} x2={600} y2={870} color={C.red} dashed />
-          <rect x={430} y={870} width={340} height={55} rx={6} fill={C.panel} stroke={C.red + '60'} strokeWidth={1} />
-          <text x={460} y={893} fontSize={10} fontWeight={600} fill={C.red} fontFamily="'JetBrains Mono'">WAN / VPN</text>
-          <text x={460} y={907} fontSize={8} fill={C.textDim} fontFamily="'JetBrains Mono'">Internet Gateway • Tailscale Mesh • Parsec</text>
+          {/* === ER4 VPN Gateway === */}
+          <ConnectionLine x1={560} y1={480} x2={750} y2={735} color={C.red} dashed />
+          <SpeedBadge x={660} y={710} label="ER4 VPN" color={C.red} />
 
-          <ConnectionLine x1={600} y1={925} x2={600} y2={960} color={C.red} dashed />
+          <rect x={660} y={735} width={200} height={50} rx={6} fill={C.panel} stroke={C.red + '60'} strokeWidth={1} />
+          <text x={680} y={757} fontSize={9} fontWeight={600} fill={C.red} fontFamily="'JetBrains Mono'">ER4 Gateway</text>
+          <text x={680} y={772} fontSize={8} fill={C.textDim} fontFamily="'JetBrains Mono'">MS510 Port 2 • VPN → Remote</text>
+
+          <ConnectionLine x1={760} y1={785} x2={760} y2={810} color={C.red} dashed />
+
+          {card('warmachine', 560, 810, 400, 100, [
+            "CPU: AMD Ryzen 9 9950X  •  Jeremy's Machine",
+            'RAM: 128GB DDR5 (arrives Mar 11)',
+            'GPU: RTX 5080 16GB  •  Remote via Edge4 VPN',
+            'Role: Remote dev workstation',
+          ])}
+
+          {/* === WAN / VPN === */}
+          <ConnectionLine x1={600} y1={910} x2={600} y2={940} color={C.red} dashed />
+          <rect x={430} y={940} width={340} height={55} rx={6} fill={C.panel} stroke={C.red + '60'} strokeWidth={1} />
+          <text x={460} y={963} fontSize={10} fontWeight={600} fill={C.red} fontFamily="'JetBrains Mono'">WAN / VPN</text>
+          <text x={460} y={977} fontSize={8} fill={C.textDim} fontFamily="'JetBrains Mono'">Internet Gateway • Tailscale Mesh • Parsec</text>
+
+          <ConnectionLine x1={600} y1={995} x2={600} y2={1030} color={C.red} dashed />
 
           {/* === COLO SERVERS === */}
-          <text x={svgW / 2} y={975} textAnchor="middle" fontSize={10} fill={C.textDim} fontFamily="'JetBrains Mono'" letterSpacing={2}>
+          <text x={svgW / 2} y={1045} textAnchor="middle" fontSize={10} fill={C.textDim} fontFamily="'JetBrains Mono'" letterSpacing={2}>
             COLO SERVERS (VPN CONNECTED)
           </text>
 
-          {card('jarvis', 60, 990, 265, 120, [
+          {card('jarvis', 60, 1060, 265, 120, [
             'Boca Raton (Colo)',
             'GPU: 4× NVIDIA L40S 48GB',
             '192GB Total VRAM',
@@ -275,21 +309,21 @@ export function PhysicalView() {
             'iDRAC: .23',
           ])}
 
-          {card('starktower', 345, 990, 265, 120, [
+          {card('starktower', 345, 1060, 265, 120, [
             'Atlanta (Cloud)',
             'Main Production Server',
             'Web / Database Stack',
             'Active',
           ])}
 
-          {card('starkindustries', 630, 990, 265, 120, [
+          {card('starkindustries', 630, 1060, 265, 120, [
             'Boca Raton (Colo)',
             'Secondary Production',
             'Web / Database Stack',
             'Active',
           ])}
 
-          {card('malibu', 915, 990, 245, 120, [
+          {card('malibu', 915, 1060, 245, 120, [
             'Boca Raton (Colo)',
             'Test Environment',
             'Web / Database Stack',
@@ -297,27 +331,27 @@ export function PhysicalView() {
           ])}
 
           {/* === SPEED COMPARISON === */}
-          <rect x={60} y={1140} width={500} height={110} rx={8} fill={C.panel} stroke={C.border} strokeWidth={1} />
-          <text x={80} y={1165} fontSize={11} fontWeight={700} fill={C.textBright} fontFamily="'JetBrains Mono'">SPEED COMPARISON</text>
-          <rect x={80} y={1175} width={100} height={12} rx={2} fill={C.textDim + '30'} />
-          <rect x={80} y={1175} width={10} height={12} rx={2} fill={C.textDim} />
-          <text x={195} y={1185} fontSize={9} fill={C.textDim} fontFamily="'JetBrains Mono'">Old LAN 1GbE ~125 MB/s</text>
-          <rect x={80} y={1198} width={100} height={12} rx={2} fill={C.cyan10g + '60'} />
-          <text x={195} y={1208} fontSize={9} fill={C.cyan10g} fontFamily="'JetBrains Mono'">New LAN 10G/2.5G ~1.25 GB/s (10×)</text>
-          <rect x={80} y={1221} width={450} height={12} rx={2} fill={C.green100g + '40'} />
-          <text x={195} y={1231} fontSize={9} fill={C.green100g} fontFamily="'JetBrains Mono'">AI Fabric 100GbE ~12.5 GB/s (100×)</text>
+          <rect x={60} y={1210} width={500} height={110} rx={8} fill={C.panel} stroke={C.border} strokeWidth={1} />
+          <text x={80} y={1235} fontSize={11} fontWeight={700} fill={C.textBright} fontFamily="'JetBrains Mono'">SPEED COMPARISON</text>
+          <rect x={80} y={1245} width={100} height={12} rx={2} fill={C.textDim + '30'} />
+          <rect x={80} y={1245} width={10} height={12} rx={2} fill={C.textDim} />
+          <text x={195} y={1255} fontSize={9} fill={C.textDim} fontFamily="'JetBrains Mono'">Old LAN 1GbE ~125 MB/s</text>
+          <rect x={80} y={1268} width={100} height={12} rx={2} fill={C.cyan10g + '60'} />
+          <text x={195} y={1278} fontSize={9} fill={C.cyan10g} fontFamily="'JetBrains Mono'">New LAN 10G/2.5G ~1.25 GB/s (10×)</text>
+          <rect x={80} y={1291} width={450} height={12} rx={2} fill={C.green100g + '40'} />
+          <text x={195} y={1301} fontSize={9} fill={C.green100g} fontFamily="'JetBrains Mono'">AI Fabric 100GbE ~12.5 GB/s (100×)</text>
 
           {/* === REMOTE ACCESS === */}
-          <rect x={600} y={1140} width={540} height={110} rx={8} fill={C.panel} stroke={C.border} strokeWidth={1} />
-          <text x={620} y={1165} fontSize={11} fontWeight={700} fill={C.textBright} fontFamily="'JetBrains Mono'">REMOTE ACCESS</text>
-          <text x={620} y={1187} fontSize={9} fill={C.accent} fontFamily="'JetBrains Mono'">● Parsec — GPU-accelerated remote desktop</text>
-          <text x={620} y={1206} fontSize={9} fill={C.purple} fontFamily="'JetBrains Mono'">● Barrier KVM — shared keyboard/mouse across nodes</text>
-          <text x={620} y={1225} fontSize={9} fill={C.warning} fontFamily="'JetBrains Mono'">● WinRM Mesh — remote PowerShell admin (all nodes)</text>
-          <text x={620} y={1244} fontSize={9} fill={C.red} fontFamily="'JetBrains Mono'">● Tailscale — encrypted overlay VPN (100.x.x.x)</text>
+          <rect x={600} y={1210} width={540} height={110} rx={8} fill={C.panel} stroke={C.border} strokeWidth={1} />
+          <text x={620} y={1235} fontSize={11} fontWeight={700} fill={C.textBright} fontFamily="'JetBrains Mono'">REMOTE ACCESS</text>
+          <text x={620} y={1257} fontSize={9} fill={C.accent} fontFamily="'JetBrains Mono'">● Parsec — GPU-accelerated remote desktop</text>
+          <text x={620} y={1276} fontSize={9} fill={C.purple} fontFamily="'JetBrains Mono'">● Barrier KVM — shared keyboard/mouse across nodes</text>
+          <text x={620} y={1295} fontSize={9} fill={C.warning} fontFamily="'JetBrains Mono'">● WinRM Mesh — remote PowerShell admin (all nodes)</text>
+          <text x={620} y={1314} fontSize={9} fill={C.red} fontFamily="'JetBrains Mono'">● Tailscale — encrypted overlay VPN (100.x.x.x)</text>
 
           {/* === LEGEND === */}
-          <rect x={60} y={1270} width={1080} height={55} rx={8} fill={C.panel} stroke={C.border} strokeWidth={1} />
-          <text x={80} y={1290} fontSize={10} fontWeight={600} fill={C.textDim} fontFamily="'JetBrains Mono'">LEGEND</text>
+          <rect x={60} y={1340} width={1080} height={55} rx={8} fill={C.panel} stroke={C.border} strokeWidth={1} />
+          <text x={80} y={1360} fontSize={10} fontWeight={600} fill={C.textDim} fontFamily="'JetBrains Mono'">LEGEND</text>
           {[
             { color: C.warning, label: 'Flagship', x: 160 },
             { color: C.purple, label: 'Dual-Homed Compute', x: 280 },
@@ -325,15 +359,15 @@ export function PhysicalView() {
             { color: C.blue, label: 'Build / Test', x: 600 },
             { color: C.coloGreen, label: 'Colo AI Server', x: 730 },
             { color: C.webPurple, label: 'Colo Web / Prod', x: 890 },
-            { color: C.green100g, label: '100GbE AI Fabric', x: 160, y: 1310 },
-            { color: C.cyan10g, label: '10G/2.5G LAN', x: 340, y: 1310 },
-            { color: C.accent, label: 'Display / DP 2.1', x: 510, y: 1310 },
-            { color: C.red, label: 'WAN / VPN', x: 680, y: 1310 },
-            { color: C.textDim, label: 'PoE Edge', x: 820, y: 1310 },
+            { color: C.green100g, label: '100GbE AI Fabric', x: 160, y: 1380 },
+            { color: C.cyan10g, label: '10G/2.5G LAN', x: 340, y: 1380 },
+            { color: C.accent, label: 'Display / DP 2.1', x: 510, y: 1380 },
+            { color: C.red, label: 'WAN / VPN', x: 680, y: 1380 },
+            { color: C.textDim, label: 'PoE Edge', x: 820, y: 1380 },
           ].map((item) => (
             <g key={item.label}>
-              <rect x={item.x} y={(item.y || 1282) - 3} width={10} height={10} rx={2} fill={item.color} />
-              <text x={item.x + 15} y={(item.y || 1290)} fontSize={9} fill={C.textDim} fontFamily="'JetBrains Mono'">{item.label}</text>
+              <rect x={item.x} y={(item.y || 1352) - 3} width={10} height={10} rx={2} fill={item.color} />
+              <text x={item.x + 15} y={(item.y || 1360)} fontSize={9} fill={C.textDim} fontFamily="'JetBrains Mono'">{item.label}</text>
             </g>
           ))}
         </svg>

@@ -123,46 +123,48 @@ export function NodeModal({ node, onClose }: NodeModalProps) {
           </Section>
 
           {/* Vibe Coding Apps */}
-          <Section title="VIBE CODING APPS" icon="◈" color={C.green100g}>
-            <div className="grid grid-cols-2 gap-2">
-              {node.apps.map((app, i) => {
-                const catColor = APP_CATEGORY_COLORS[app.category]
-                const catIcon = APP_CATEGORY_ICONS[app.category]
-                return (
-                  <div
-                    key={i}
-                    className="rounded-lg p-3"
-                    style={{ background: catColor + '08', border: `1px solid ${catColor}25` }}
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs" style={{ color: catColor }}>{catIcon}</span>
-                      <span className="text-[11px] font-semibold" style={{ color: C.textBright }}>{app.name}</span>
-                      {app.port && (
-                        <span
-                          className="ml-auto text-[9px] px-1.5 py-0.5 rounded font-mono"
-                          style={{ color: catColor, background: catColor + '15' }}
-                        >
-                          :{app.port}
-                        </span>
+          {node.apps.length > 0 && (
+            <Section title="VIBE CODING APPS" icon="◈" color={C.green100g}>
+              <div className="grid grid-cols-2 gap-2">
+                {node.apps.map((app, i) => {
+                  const catColor = APP_CATEGORY_COLORS[app.category]
+                  const catIcon = APP_CATEGORY_ICONS[app.category]
+                  return (
+                    <div
+                      key={i}
+                      className="rounded-lg p-3"
+                      style={{ background: catColor + '08', border: `1px solid ${catColor}25` }}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs" style={{ color: catColor }}>{catIcon}</span>
+                        <span className="text-[11px] font-semibold" style={{ color: C.textBright }}>{app.name}</span>
+                        {app.port && (
+                          <span
+                            className="ml-auto text-[9px] px-1.5 py-0.5 rounded font-mono"
+                            style={{ color: catColor, background: catColor + '15' }}
+                          >
+                            :{app.port}
+                          </span>
+                        )}
+                      </div>
+                      {app.detail && (
+                        <p className="text-[10px] leading-relaxed" style={{ color: C.textDim }}>{app.detail}</p>
                       )}
                     </div>
-                    {app.detail && (
-                      <p className="text-[10px] leading-relaxed" style={{ color: C.textDim }}>{app.detail}</p>
-                    )}
+                  )
+                })}
+              </div>
+              {/* Category legend */}
+              <div className="flex flex-wrap gap-3 mt-3 pt-3" style={{ borderTop: `1px solid ${C.border}` }}>
+                {Object.entries(APP_CATEGORY_ICONS).map(([cat, icon]) => (
+                  <div key={cat} className="flex items-center gap-1">
+                    <span className="text-[10px]" style={{ color: APP_CATEGORY_COLORS[cat] }}>{icon}</span>
+                    <span className="text-[9px] capitalize" style={{ color: C.textDim }}>{cat}</span>
                   </div>
-                )
-              })}
-            </div>
-            {/* Category legend */}
-            <div className="flex flex-wrap gap-3 mt-3 pt-3" style={{ borderTop: `1px solid ${C.border}` }}>
-              {Object.entries(APP_CATEGORY_ICONS).map(([cat, icon]) => (
-                <div key={cat} className="flex items-center gap-1">
-                  <span className="text-[10px]" style={{ color: APP_CATEGORY_COLORS[cat] }}>{icon}</span>
-                  <span className="text-[9px] capitalize" style={{ color: C.textDim }}>{cat}</span>
-                </div>
-              ))}
-            </div>
-          </Section>
+                ))}
+              </div>
+            </Section>
+          )}
 
           {/* Networking */}
           <Section title="NETWORK INTERFACES" icon="⇄" color={C.cyan10g}>
@@ -238,6 +240,58 @@ export function NodeModal({ node, onClose }: NodeModalProps) {
                     </div>
                   </div>
                 ))}
+              </div>
+            </Section>
+          )}
+
+          {/* Port Map (switches) */}
+          {node.ports && node.ports.length > 0 && (
+            <Section title="PORT MAP" icon="⬡" color={C.cyan10g}>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
+                  <thead>
+                    <tr>
+                      {['Port', 'Speed', 'Device', 'Notes'].map((h) => (
+                        <th
+                          key={h}
+                          className="text-[9px] font-bold tracking-widest uppercase px-3 py-2"
+                          style={{ color: C.cyan10g, borderBottom: `1px solid ${C.cyan10g}30` }}
+                        >
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {node.ports.map((p, i) => (
+                      <tr
+                        key={i}
+                        style={{ background: i % 2 === 0 ? 'transparent' : `${C.cyan10g}05` }}
+                      >
+                        <td className="text-[11px] font-mono font-semibold px-3 py-2" style={{ color: C.textBright }}>
+                          {p.port}
+                        </td>
+                        <td className="px-3 py-2">
+                          <span
+                            className="text-[10px] font-mono px-1.5 py-0.5 rounded"
+                            style={{
+                              color: p.speed === '10G' ? C.green100g : C.cyan10g,
+                              background: (p.speed === '10G' ? C.green100g : C.cyan10g) + '15',
+                            }}
+                          >
+                            {p.speed}
+                          </span>
+                        </td>
+                        <td className="text-[11px] px-3 py-2" style={{ color: C.textBright }}>
+                          {p.device}
+                        </td>
+                        <td className="text-[10px] px-3 py-2" style={{ color: C.textDim }}>
+                          {p.notes}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </Section>
           )}

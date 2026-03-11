@@ -157,12 +157,12 @@ export function LogicalView() {
             ]} />
           </Section>
 
-          <Section title="WAR-MACHINE — Jeremy" color={C.blue} nodeId="warmachine" onNodeClick={openModal}>
-            <ServiceCard name="Dev Workstation (Building)" color={C.blue} details={[
+          <Section title="WAR-MACHINE — Jeremy (Remote)" color={C.blue} nodeId="warmachine" onNodeClick={openModal}>
+            <ServiceCard name="Remote Dev Workstation" color={C.blue} details={[
               'AMD Ryzen 9 9950X • RTX 5080 16GB',
               '128GB DDR5 (RAM arriving Mar 11)',
               'Ollama :11434 + JARVIS colo inference access',
-              '2.5GbE LAN',
+              'Edge4 VPN → ER4 Gateway (MS510 Port 2)',
             ]} />
           </Section>
 
