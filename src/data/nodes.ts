@@ -1,3 +1,5 @@
+import type { SiteId } from './sites'
+
 export type NodeStatus = 'online' | 'building' | 'coming-soon' | 'staging'
 
 export interface AppEntry {
@@ -35,6 +37,7 @@ export interface NodeData {
   status: NodeStatus
   role: string
   colorKey: string
+  siteId: SiteId
   hardware: string[]
   apps: AppEntry[]
   interfaces: NetInterface[]
@@ -51,6 +54,7 @@ export const NODES: Record<string, NodeData> = {
     status: 'coming-soon',
     role: 'Flagship Inference + Primary Dev',
     colorKey: 'warning',
+    siteId: 'boca-lab',
     hardware: [
       'CPU: AMD Threadripper PRO 9995WX — 64C/128T',
       'RAM: 256GB DDR5 ECC RDIMM (4×64GB)',
@@ -94,6 +98,7 @@ export const NODES: Record<string, NodeData> = {
     status: 'online',
     role: "James's Primary Workstation",
     colorKey: 'pink',
+    siteId: 'boca-lab',
     hardware: [
       'CPU: AMD Ryzen 9 9950X3D 16C/32T',
       'RAM: 192GB DDR5',
@@ -138,6 +143,7 @@ export const NODES: Record<string, NodeData> = {
     status: 'online',
     role: 'Docker / Monitoring / jarvis-rag Host',
     colorKey: 'purple',
+    siteId: 'boca-lab',
     hardware: [
       'CPU: Intel Ultra 9 285K',
       'RAM: 128GB DDR5',
@@ -177,6 +183,7 @@ export const NODES: Record<string, NodeData> = {
     status: 'online',
     role: 'Primary Dev Workstation',
     colorKey: 'purple',
+    siteId: 'boca-lab',
     hardware: [
       'CPU: Intel Ultra 9 285K',
       'RAM: 128GB DDR5',
@@ -217,6 +224,7 @@ export const NODES: Record<string, NodeData> = {
     status: 'building',
     role: "Jeremy's Dev Workstation (Remote)",
     colorKey: 'blue',
+    siteId: 'remote-wm',
     hardware: [
       'CPU: AMD Ryzen 9 9950X',
       'RAM: 128GB DDR5-5600 (4×32GB Kingston KF556C40, arriving Mar 11)',
@@ -251,6 +259,7 @@ export const NODES: Record<string, NodeData> = {
     status: 'online',
     role: 'E2E Test Runner / Home Desktop',
     colorKey: 'textDim',
+    siteId: 'remote-happy',
     hardware: [
       'Home Desktop (not part of AI inference fleet)',
     ],
@@ -281,6 +290,7 @@ export const NODES: Record<string, NodeData> = {
     status: 'online',
     role: 'Colo AI Inference Server — Boca Raton',
     colorKey: 'coloGreen',
+    siteId: 'boca-colo',
     hardware: [
       'Model: Dell R760xa',
       'GPU: 4× NVIDIA L40S 48GB (192GB Total VRAM)',
@@ -313,6 +323,7 @@ export const NODES: Record<string, NodeData> = {
     status: 'online',
     role: 'Primary Production Server',
     colorKey: 'webPurple',
+    siteId: 'atlanta',
     hardware: [
       'Location: Atlanta (Cloud)',
       'Role: Main Production Web + Database Stack',
@@ -337,6 +348,7 @@ export const NODES: Record<string, NodeData> = {
     status: 'online',
     role: 'Secondary Production Server',
     colorKey: 'webPurple',
+    siteId: 'boca-colo',
     hardware: [
       'Location: Boca Raton (Colo)',
       'Role: Secondary Production Web + Database Stack',
@@ -360,6 +372,7 @@ export const NODES: Record<string, NodeData> = {
     status: 'staging',
     role: 'Staging / Test Environment',
     colorKey: 'webPurple',
+    siteId: 'boca-colo',
     hardware: [
       'Location: Boca Raton (Colo)',
       'Role: Staging + Test Web + Database Stack',
@@ -383,6 +396,7 @@ export const NODES: Record<string, NodeData> = {
     status: 'online',
     role: 'Netgear MS510TXUP — 10G/Multi-Gig Managed Switch',
     colorKey: 'cyan10g',
+    siteId: 'boca-lab',
     hardware: [
       'Model: Netgear MS510TXUP',
       '4× 10G copper + 4× 2.5G copper + 2× SFP+ 10G',
@@ -420,6 +434,7 @@ export const NODES: Record<string, NodeData> = {
     status: 'online',
     role: 'Mellanox SN2100 — 100GbE AI Fabric Switch',
     colorKey: 'green100g',
+    siteId: 'boca-lab',
     hardware: [
       'Model: Mellanox SN2100 (Spectrum ASIC)',
       '16× QSFP28 100GbE ports',
@@ -440,6 +455,66 @@ export const NODES: Record<string, NodeData> = {
       { port: '3', speed: '100GbE', device: 'JERICHO (10.2.10.35)', notes: 'ConnectX-5 VPI' },
       { port: '4', speed: '100GbE', device: 'IRONMAN (TBD)', notes: 'ConnectX-5 VPI — reserve now' },
       { port: '5-16', speed: '100GbE', device: 'Spare', notes: 'Future nodes / expansion' },
+    ],
+  },
+
+  gs752tpv2: {
+    id: 'gs752tpv2',
+    name: 'GS752TPv2',
+    badge: 'PoE EDGE',
+    status: 'online',
+    role: 'Netgear GS752TPv2 — 48-Port PoE+ Managed Switch',
+    colorKey: 'textDim',
+    siteId: 'boca-lab',
+    hardware: [
+      'Model: Netgear GS752TPv2',
+      '48× 1GbE PoE+ ports + 4× SFP combo',
+      '380W PoE budget',
+      'VLAN capable • LACP • QoS • Internet uplink',
+    ],
+    apps: [],
+    interfaces: [
+      { label: 'SFP Uplink to MS510TXUP', speed: '1G SFP', target: 'MS510TXUP Port 4', color: 'lan' },
+      { label: 'WAN Uplink', speed: '1GbE', target: 'Internet Gateway', color: 'wan' },
+    ],
+    services: [],
+    notes: [
+      'Internet uplink — connects to WAN/VPN gateway',
+      'PoE edge for peripherals, APs, cameras',
+      'SFP link to MS510TXUP at 1G (Cat6)',
+    ],
+    ports: [
+      { port: '1-12', speed: '1GbE PoE+', device: 'Peripherals / IoT', notes: 'General PoE devices' },
+      { port: 'SFP1', speed: '1G SFP', device: '→ MS510TXUP Port 4', notes: 'Inter-switch uplink' },
+    ],
+  },
+
+  er4: {
+    id: 'er4',
+    name: 'ER4',
+    badge: 'VPN GW',
+    status: 'online',
+    role: 'Ubiquiti EdgeRouter 4 — VPN Gateway',
+    colorKey: 'red',
+    siteId: 'boca-lab',
+    hardware: [
+      'Model: Ubiquiti EdgeRouter 4 (ER-4)',
+      '4× 1GbE RJ45 ports',
+      'Quad-Core 1GHz MIPS64',
+      '1GB DDR3 RAM',
+    ],
+    apps: [],
+    interfaces: [
+      { label: 'LAN', speed: '1GbE', target: 'MS510TXUP Port 2', color: 'lan' },
+      { label: 'VPN Tunnels', speed: 'VPN', target: 'War-Machine + Remote sites', color: 'wan' },
+    ],
+    services: [
+      { name: 'EdgeOS VPN', detail: 'Site-to-site VPN for WAR-MACHINE and remote nodes' },
+    ],
+    notes: [
+      'Connected to MS510TXUP Port 2',
+      'Provides VPN gateway for remote sites',
+      'Power draw: ~25W',
     ],
   },
 }

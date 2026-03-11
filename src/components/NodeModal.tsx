@@ -1,19 +1,5 @@
 import { NodeData } from '../data/nodes'
-import { C } from '../constants/colors'
-
-const COLOR_MAP: Record<string, string> = {
-  warning: C.warning,
-  purple: C.purple,
-  pink: C.pink,
-  green100g: C.green100g,
-  cyan10g: C.cyan10g,
-  accent: C.accent,
-  red: C.red,
-  blue: C.blue,
-  coloGreen: C.coloGreen,
-  webPurple: C.webPurple,
-  textDim: C.textDim,
-}
+import { C, COLOR_MAP } from '../constants/colors'
 
 const APP_CATEGORY_ICONS: Record<string, string> = {
   ide: '⌨',

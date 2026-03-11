@@ -20,3 +20,18 @@ export const C = {
 } as const
 
 export type ColorKey = keyof typeof C
+
+/** Maps node colorKey strings to their hex values */
+export const COLOR_MAP: Record<string, string> = {
+  warning: C.warning,
+  purple: C.purple,
+  pink: C.pink,
+  green100g: C.green100g,
+  cyan10g: C.cyan10g,
+  accent: C.accent,
+  red: C.red,
+  blue: C.blue,
+  coloGreen: C.coloGreen,
+  webPurple: C.webPurple,
+  textDim: C.textDim,
+}
