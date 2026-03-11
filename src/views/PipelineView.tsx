@@ -266,14 +266,14 @@ export function PipelineView() {
 
         <div className="flex justify-center gap-3 flex-wrap">
           <BranchColumn label="DISPATCH" color={C.red}>
-            <Node icon="🤖" title="Claude Code Workers" detail="Complex coding tasks. Multi-file changes. D-Score ≥ 0.55" file="worker-main, worker-jericho, worker-sentinel" variant="dispatch" />
-            <Node icon="🤖" title="Ollama Workers" detail="D-Score < 0.55: qwen3.5-35b (simple) or qwen3.5-122b (medium). Local GPU on RTX 5090" file="Sentinel Ollama :11434" variant="dispatch" />
+            <Node icon="🤖" title="Claude Code Workers" detail="Complex coding tasks. Multi-file changes. D-Score ≥ 0.55" file="worker-main (IRON-PATRIOT) · worker-jericho · worker-sentinel" variant="dispatch" />
+            <Node icon="🤖" title="Ollama Workers" detail="D-Score < 0.55: qwen3.5-35b (simple) or qwen3.5-122b (medium). Local GPU on RTX 5090" file="SENTINEL Ollama :11434" variant="dispatch" />
           </BranchColumn>
           <BranchColumn label="REVIEW" color={C.warning}>
-            <Node icon="🔍" title="Sentinel Review" detail="daily-driver LLM (Qwen3.5-35B) code review. Checks acceptance criteria, code quality." file="bridge/reviewer.ts" variant="bridge" />
+            <Node icon="🔍" title="SENTINEL Review" detail="daily-driver LLM (Qwen3.5-35B) code review. Checks acceptance criteria, code quality." file="bridge/reviewer.ts" variant="bridge" />
           </BranchColumn>
           <BranchColumn label="TEST" color={C.pink}>
-            <Node icon="🧪" title="Happy E2E Worker" detail="Playwright tests. Atomic claim (FOR UPDATE SKIP LOCKED). JSON output parsed by result-reporter.js" file="happy/worker.js + result-reporter.js" variant="test" />
+            <Node icon="🧪" title="HAPPY E2E Worker" detail="Playwright tests. Atomic claim (FOR UPDATE SKIP LOCKED). JSON output parsed by result-reporter.js" file="HAPPY/worker.js + result-reporter.js" variant="test" />
           </BranchColumn>
           <BranchColumn label="HOLD / BLOCKED" color={C.textDim}>
             <Node icon="⏸️" title="Deferred" detail="Task held for next cycle or marked BLOCKED with Discord alert" variant="muted" />
@@ -281,7 +281,7 @@ export function PipelineView() {
         </div>
 
         <div className="mt-2 space-y-0.5">
-          <Sub><strong>Machine Topology:</strong> Iron-Patriot (orchestrator + worker-main) · Jericho (worker-jericho) · Sentinel (worker-sentinel, RTX 5090) · Happy (E2E test runner)</Sub>
+          <Sub><strong>Machine Topology:</strong> IRON-PATRIOT (orchestrator + worker-main) · JERICHO (worker-jericho) · SENTINEL (worker-sentinel, RTX 5090) · HAPPY (E2E test runner)</Sub>
           <Sub><strong>3-Tier Task Claiming:</strong> worker-targeted → machine-targeted → general pool</Sub>
         </div>
       </Phase>
@@ -343,7 +343,7 @@ export function PipelineView() {
         </div>
 
         <div className="flex justify-center gap-3 flex-wrap">
-          <Node icon="👁️" title="Watchdog Monitor" detail="6-component health: exec_supabase, ops_supabase, bridge, discord, ollama, happy. 30s interval." file="watchdog.py" variant="heal" />
+          <Node icon="👁️" title="Watchdog Monitor" detail="6-component health: exec_supabase, ops_supabase, bridge, discord, ollama, HAPPY. 30s interval." file="watchdog.py" variant="heal" />
           <Node icon="📊" title="QUBO Metrics" detail="Per-cycle structured metrics: decisions made, dispatch count, solve time, energy values, stall count" file="qubo_metrics table" variant="heal" />
           <Node icon="🔒" title="PID File Lock" detail="Prevents dual execution (NSSM service vs child process). Stale PID reclaim on startup." file="qubo/.qubo.pid" variant="heal" />
           <Node icon="🔥" title="Worker Heartbeat" detail="60s interval. last_heartbeat + worker_pid + worker_host. 30min staleness threshold for IN_PROGRESS reclaim." variant="heal" />
