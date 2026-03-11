@@ -412,4 +412,34 @@ export const NODES: Record<string, NodeData> = {
       { port: '10 (SFP+)', speed: '10G', device: 'Spare', notes: 'Future expansion' },
     ],
   },
+
+  sn2100: {
+    id: 'sn2100',
+    name: 'SN2100',
+    badge: '100GbE AI FABRIC',
+    status: 'online',
+    role: 'Mellanox SN2100 — 100GbE AI Fabric Switch',
+    colorKey: 'green100g',
+    hardware: [
+      'Model: Mellanox SN2100 (Spectrum ASIC)',
+      '16× QSFP28 100GbE ports',
+      '3.2 Tb/s switching capacity',
+      'RoCEv2 RDMA enabled — zero-copy model weight transfer',
+    ],
+    apps: [],
+    interfaces: [],
+    services: [],
+    notes: [
+      'Dedicated AI fabric — isolated from general LAN',
+      'Subnet: 10.2.20.x',
+      'All nodes use ConnectX-5 VPI NICs for RDMA',
+    ],
+    ports: [
+      { port: '1', speed: '100GbE', device: 'SENTINEL (10.2.10.70)', notes: 'ConnectX-5 VPI' },
+      { port: '2', speed: '100GbE', device: 'IRON-PATRIOT (10.2.10.71)', notes: 'ConnectX-5 VPI' },
+      { port: '3', speed: '100GbE', device: 'JERICHO (10.2.10.35)', notes: 'ConnectX-5 VPI' },
+      { port: '4', speed: '100GbE', device: 'IRONMAN (TBD)', notes: 'ConnectX-5 VPI — reserve now' },
+      { port: '5-16', speed: '100GbE', device: 'Spare', notes: 'Future nodes / expansion' },
+    ],
+  },
 }

@@ -204,7 +204,8 @@ export function PhysicalView() {
           <text x={svgW / 2} y={388} textAnchor="middle" fontSize={10} fill={C.textDim} fontFamily="'JetBrains Mono'" letterSpacing={4}>SWITCH LAYER</text>
 
           <SwitchCard x={60} y={400} w={300} h={80} label="Mellanox SN2100" badge="100GbE AI FABRIC"
-            color={C.green100g} ports={16} activeCount={3} totalCount={16} />
+            color={C.green100g} ports={16} activeCount={3} totalCount={16}
+            selected={activeModal === 'sn2100'} onClick={() => openModal('sn2100')} />
           <SwitchCard x={440} y={400} w={300} h={80} label="Netgear MS510TXUP" badge="10G LAN CORE"
             color={C.cyan10g} ports={10} activeCount={8} totalCount={10}
             selected={activeModal === 'ms510txup'} onClick={() => openModal('ms510txup')} />

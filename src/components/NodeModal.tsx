@@ -246,7 +246,7 @@ export function NodeModal({ node, onClose }: NodeModalProps) {
 
           {/* Port Map (switches) */}
           {node.ports && node.ports.length > 0 && (
-            <Section title="PORT MAP" icon="⬡" color={C.cyan10g}>
+            <Section title="PORT MAP" icon="⬡" color={accentColor}>
               <div className="overflow-x-auto">
                 <table className="w-full text-left" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
                   <thead>
@@ -255,7 +255,7 @@ export function NodeModal({ node, onClose }: NodeModalProps) {
                         <th
                           key={h}
                           className="text-[9px] font-bold tracking-widest uppercase px-3 py-2"
-                          style={{ color: C.cyan10g, borderBottom: `1px solid ${C.cyan10g}30` }}
+                          style={{ color: accentColor, borderBottom: `1px solid ${accentColor}30` }}
                         >
                           {h}
                         </th>
@@ -266,7 +266,7 @@ export function NodeModal({ node, onClose }: NodeModalProps) {
                     {node.ports.map((p, i) => (
                       <tr
                         key={i}
-                        style={{ background: i % 2 === 0 ? 'transparent' : `${C.cyan10g}05` }}
+                        style={{ background: i % 2 === 0 ? 'transparent' : `${accentColor}05` }}
                       >
                         <td className="text-[11px] font-mono font-semibold px-3 py-2" style={{ color: C.textBright }}>
                           {p.port}
@@ -275,8 +275,8 @@ export function NodeModal({ node, onClose }: NodeModalProps) {
                           <span
                             className="text-[10px] font-mono px-1.5 py-0.5 rounded"
                             style={{
-                              color: p.speed === '10G' ? C.green100g : C.cyan10g,
-                              background: (p.speed === '10G' ? C.green100g : C.cyan10g) + '15',
+                              color: p.speed.includes('100G') ? C.green100g : p.speed === '10G' ? C.accent : C.cyan10g,
+                              background: (p.speed.includes('100G') ? C.green100g : p.speed === '10G' ? C.accent : C.cyan10g) + '15',
                             }}
                           >
                             {p.speed}
