@@ -1,16 +1,4 @@
-const C = {
-  warning: '#f59e0b',
-  purple: '#a78bfa',
-  pink: '#f472b6',
-  green100g: '#34d399',
-  cyan10g: '#38bdf8',
-  accent: '#00d4ff',
-  red: '#ef4444',
-  textDim: '#94a3b8',
-  textBright: '#e2e8f0',
-  panel: '#111827',
-  border: '#1e293b',
-}
+import { C } from '../constants/colors'
 
 function ProgressBar({ value, max, color, label }: { value: number; max: number; color: string; label: string }) {
   const pct = (value / max) * 100

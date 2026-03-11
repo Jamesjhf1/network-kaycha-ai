@@ -114,7 +114,7 @@ export const NODES: Record<string, NodeData> = {
       { name: 'Ollama', port: '11434', detail: 'Qwen3.5-35B-A3B daily driver (149 tok/s)' },
       { name: 'Open WebUI', port: '3000', detail: 'Docker container, restart=always' },
       { name: 'mcpo MCP proxy', port: '8001', detail: '11 MCP servers bridged over HTTP' },
-      { name: 'WinRM', port: '5985', detail: 'PowerShell remoting — jarvis/2Quick4u' },
+      { name: 'WinRM', port: '5985', detail: 'PowerShell remoting — credentials in 1Password' },
       { name: 'Chat Harvester', detail: 'Every 30 min: OWU + Cursor + Claude Code → JARVIS-KB' },
     ],
     notes: [
@@ -155,7 +155,7 @@ export const NODES: Record<string, NodeData> = {
       { name: 'Grafana', port: '3000', detail: 'AI fleet monitoring dashboards (Docker)' },
       { name: 'Prometheus', port: '9090', detail: 'Metrics scraper via WinRM across fleet' },
       { name: 'jarvis-rag', port: '3100', detail: 'RAG MCP server — rag_search, rag_context RPCs' },
-      { name: 'WinRM', port: '5985', detail: 'PowerShell remoting — jarvis/2Quick4u' },
+      { name: 'WinRM', port: '5985', detail: 'PowerShell remoting — credentials in 1Password' },
     ],
     notes: [
       'Setup script may stall (winget broken) — run phases manually via SSH, do not re-run blindly',
@@ -194,7 +194,7 @@ export const NODES: Record<string, NodeData> = {
       { name: 'Ollama Worker', port: '11434', detail: 'Qwen3 32B / Mistral / embed — 96GB VRAM' },
       { name: 'Open WebUI', port: '3000', detail: 'Docker restart=always' },
       { name: 'JARVIS-OPS Orchestrator', detail: 'Discord bot + task queue + 3 worker agents' },
-      { name: 'WinRM', port: '5985', detail: 'PowerShell remoting — jarvis/2Quick4u' },
+      { name: 'WinRM', port: '5985', detail: 'PowerShell remoting — credentials in 1Password' },
     ],
     notes: [
       'Auto-start configured: Ollama (startup shortcut), Docker Desktop, Open WebUI (docker), Claude Desktop (AppX AUMID)',

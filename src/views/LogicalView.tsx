@@ -1,21 +1,7 @@
 import { useState } from 'react'
 import { NODES } from '../data/nodes'
 import { NodeModal } from '../components/NodeModal'
-
-const C = {
-  warning: '#f59e0b',
-  purple: '#a78bfa',
-  pink: '#f472b6',
-  green100g: '#34d399',
-  cyan10g: '#38bdf8',
-  accent: '#00d4ff',
-  red: '#ef4444',
-  textDim: '#94a3b8',
-  textBright: '#e2e8f0',
-  panel: '#111827',
-  border: '#1e293b',
-  bg: '#0a0e17',
-}
+import { C } from '../constants/colors'
 
 function Section({ title, color, children, className = '', nodeId, onNodeClick }: {
   title: string; color: string; children: React.ReactNode; className?: string
@@ -146,7 +132,7 @@ export function LogicalView() {
 
           <Section title="WinRM Mesh" color={C.warning}>
             <div className="text-[10px]" style={{ color: C.textDim }}>
-              <p>Credentials: jarvis / 2Quick4u • Basic Auth</p>
+              <p>Credentials: stored in 1Password • Basic Auth</p>
               <p className="mt-1">PowerShell remoting across all nodes</p>
               <p className="mt-1">SENTINEL .70 • IRON-PATRIOT .71 • JERICHO .35 • HAPPY .112</p>
             </div>
@@ -194,7 +180,7 @@ export function LogicalView() {
               <ServiceCard name="Cloudflare" color={C.warning} details={['12 zones', 'Workers + D1', 'DNS + CDN']} />
               <ServiceCard name="Netlify" color={C.cyan10g} details={['6 sites', 'Serverless Functions', 'CI/CD deploys']} />
               <ServiceCard name="GitHub" color={C.textBright} details={['Kaycha-Labs org', 'Jamesjhf1 personal', 'Actions CI + DocGen']} />
-              <ServiceCard name="JARVIS Colo" color={C.purple} details={['Dell R760xa', 'Revelex Boca Raton', '2× L40S 48GB (192GB VRAM)']} />
+              <ServiceCard name="JARVIS Colo" color={C.purple} details={['Dell R760xa', 'Revelex Boca Raton', '4× L40S 48GB (192GB VRAM)']} />
             </div>
           </Section>
 

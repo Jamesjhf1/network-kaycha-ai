@@ -1,20 +1,4 @@
-const C = {
-  warning: '#f59e0b',
-  purple: '#a78bfa',
-  pink: '#f472b6',
-  green100g: '#34d399',
-  cyan10g: '#38bdf8',
-  accent: '#00d4ff',
-  red: '#ef4444',
-  textDim: '#94a3b8',
-  textBright: '#e2e8f0',
-  panel: '#111827',
-  border: '#1e293b',
-  bg: '#0a0e17',
-  blue: '#60a5fa',
-  orange: '#fb923c',
-  teal: '#2dd4bf',
-}
+import { C } from '../constants/colors'
 
 /* ── Reusable sub-components ─────────────────────────────── */
 
@@ -383,13 +367,13 @@ export function PipelineView() {
         <StatCard value="6" label="BQM Energy Terms" color={C.green100g} />
         <StatCard value="5" label="Action Types" color={C.red} />
         <StatCard value="4" label="Worker Machines" color={C.warning} />
-        <StatCard value="189" label="E2E Audit Checks" color={C.purple} />
-        <StatCard value="95%" label="System Health Score" color={C.teal} />
+        <StatCard value="7" label="RAG Collections" color={C.purple} />
+        <StatCard value="7" label="Memory Tables" color={C.teal} />
       </div>
 
       {/* Footer */}
       <div className="text-center pt-6 pb-2 text-[11px]" style={{ color: '#475569' }}>
-        JARVIS-OPS Pipeline · Kaycha Labs · March 2026 · E2E Audit: 151/151 tests pass
+        JARVIS-OPS Pipeline · Kaycha Labs · March 2026
       </div>
     </div>
   )
