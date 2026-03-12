@@ -12,11 +12,11 @@ export interface Site {
 export const SITES: Record<SiteId, Site> = {
   'boca-lab': {
     id: 'boca-lab',
-    label: 'Boca Raton Lab',
+    label: 'Miramar Lab',
     subtitle: '8 nodes • 3 switches • 100GbE AI Fabric',
     nodeIds: ['ironman', 'sentinel', 'ironpatriot', 'jericho', 'ms510txup', 'sn2100', 'gs752tpv2', 'er4'],
     colorKey: 'cyan10g',
-    location: 'Boca Raton, FL',
+    location: 'Miramar, FL',
   },
   'boca-colo': {
     id: 'boca-colo',
