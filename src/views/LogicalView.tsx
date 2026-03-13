@@ -60,7 +60,7 @@ export function LogicalView() {
             <div className="w-3 h-3 rounded-full" style={{ background: C.green100g }} />
             <span className="text-sm font-bold tracking-wider" style={{ color: C.green100g }}>VLAN 10 — 100GbE AI FABRIC</span>
           </div>
-          <div className="text-[10px] px-2 -mt-1" style={{ color: C.textDim }}>SN2100 • ConnectX-5 VPI • RoCEv2 RDMA • 10.0.100.0/24</div>
+          <div className="text-[10px] px-2 -mt-1" style={{ color: C.textDim }}>SN2100 • ConnectX-5 VPI • RoCEv2 RDMA • 10.0.100.0/24 (not yet cabled)</div>
 
           <Section title="IRONMAN — Primary Compute" color={C.warning} nodeId="ironman" onNodeClick={openModal}>
             <ServiceCard name="Open WebUI :3000 (Primary)" color={C.warning} details={[
@@ -70,7 +70,7 @@ export function LogicalView() {
             <ServiceCard name="Ollama :11434" color={C.warning} details={[
               'Qwen3.5-122B-A10B Q8 primary / Qwen3.5-35B-A3B fast lane',
               '192GB VRAM (2× RTX PRO 6000 Blackwell, NVLink)',
-              'ConnectX-5 100GbE • 10.0.100.10',
+              'LAN 192.168.1.43 • CX-5 pending cabling',
             ]} />
             <ServiceCard name="Parsec Host" color={C.accent} details={[
               'GPU-accelerated remote desktop',
@@ -82,7 +82,7 @@ export function LogicalView() {
             <ServiceCard name="Ollama Worker :11434" color={C.purple} details={[
               'Qwen3 32B / CodeLlama 34B',
               '96GB VRAM (RTX PRO 6000 Blackwell)',
-              'ConnectX-5 100GbE • 10.0.100.20',
+              'LAN 192.168.1.42 • CX-5 pending cabling',
             ]} />
             <ServiceCard name="Grafana :3000 + Prometheus :9090" color={C.purple} details={[
               'AI fleet monitoring dashboards (Docker)',
@@ -98,25 +98,25 @@ export function LogicalView() {
               'Open WebUI / JARVIS-OPS containers',
               'Qwen3 32B / Mistral / embed models',
               '96GB VRAM (RTX PRO 6000 Blackwell)',
-              'ConnectX-5 100GbE • 10.0.100.30',
+              'LAN 192.168.1.39 • CX-5 pending cabling',
               'Auto-start configured',
             ]} />
           </Section>
 
-          <Section title="SN2100 Switch" color={C.green100g}>
+          <Section title="SN2100 Switch (Not Yet Cabled)" color={C.green100g}>
             <div className="text-[10px]" style={{ color: C.textDim }}>
               <p>16× QSFP28 ports • 3.2 Tb/s switching capacity</p>
-              <p className="mt-1">3 active ports → Ironman, Iron-Patriot, Jericho</p>
-              <p className="mt-1 font-semibold" style={{ color: C.green100g }}>RoCEv2 enabled — zero-copy RDMA for model weights</p>
+              <p className="mt-1">3 ports allocated → Ironman, Iron-Patriot, Jericho (all media disconnected)</p>
+              <p className="mt-1 font-semibold" style={{ color: C.warning }}>Fabric pending — ConnectX-5 NICs installed, awaiting cabling</p>
             </div>
           </Section>
 
           <Section title="Open WebUI Multi-Endpoint Config" color={C.accent}>
             <div className="space-y-1 text-[10px]" style={{ color: C.textDim }}>
-              <p><span style={{ color: C.warning }}>●</span> Ironman: http://10.0.100.10:11434 (primary)</p>
-              <p><span style={{ color: C.purple }}>●</span> Iron-Patriot: http://10.0.100.20:11434 (worker)</p>
-              <p><span style={{ color: C.purple }}>●</span> Jericho: http://10.0.100.30:11434 (worker)</p>
-              <p className="mt-2 font-semibold" style={{ color: C.accent }}>Load balancing across 384GB VRAM fabric (+ 32GB Sentinel)</p>
+              <p><span style={{ color: C.warning }}>●</span> Ironman: http://192.168.1.43:11434 (primary)</p>
+              <p><span style={{ color: C.purple }}>●</span> Iron-Patriot: http://192.168.1.42:11434 (worker)</p>
+              <p><span style={{ color: C.purple }}>●</span> Jericho: http://192.168.1.39:11434 (worker)</p>
+              <p className="mt-2 font-semibold" style={{ color: C.accent }}>Load balancing across 384GB VRAM (LAN, fabric pending) + 32GB Sentinel</p>
             </div>
           </Section>
 
@@ -134,7 +134,7 @@ export function LogicalView() {
             <div className="text-[10px]" style={{ color: C.textDim }}>
               <p>Credentials: stored in 1Password • Basic Auth</p>
               <p className="mt-1">PowerShell remoting across all nodes</p>
-              <p className="mt-1">SENTINEL .70 • IRON-PATRIOT .71 • JERICHO .35 • HAPPY .112</p>
+              <p className="mt-1">SENTINEL .40 • IRON-PATRIOT .42 • JERICHO .39 (192.168.1.x)</p>
             </div>
           </Section>
         </div>
@@ -145,7 +145,7 @@ export function LogicalView() {
             <div className="w-3 h-3 rounded-full" style={{ background: C.cyan10g }} />
             <span className="text-sm font-bold tracking-wider" style={{ color: C.cyan10g }}>VLAN 20 — GENERAL LAN</span>
           </div>
-          <div className="text-[10px] px-2 -mt-1" style={{ color: C.textDim }}>MS510TXUP 10G/2.5G → GS752TPv2 PoE Edge • 10.2.10.0/24</div>
+          <div className="text-[10px] px-2 -mt-1" style={{ color: C.textDim }}>MS510TXUP 10G/2.5G → GS752TPv2 PoE Edge • 192.168.1.0/24</div>
 
           <Section title="SENTINEL — Daily Driver" color={C.pink} nodeId="sentinel" onNodeClick={openModal}>
             <ServiceCard name="AI Workstation" color={C.pink} details={[
@@ -169,8 +169,8 @@ export function LogicalView() {
           <Section title="HAPPY — Test Runner" color={C.textDim} nodeId="happy" onNodeClick={openModal}>
             <ServiceCard name="E2E Test Services" color={C.textDim} details={[
               'Playwright JS — workers:1',
-              'CRM 15/16 • Exec auth broken • HR pending',
-              '10.2.10.112 • TS: 100.87.48.124',
+              'CRM 15/16 • Exec auth broken • HR cookie mode',
+              '10.1.10.243 (home) • TS: 100.87.48.124',
             ]} />
           </Section>
 
@@ -188,9 +188,9 @@ export function LogicalView() {
           <Section title="VRAM Budget" color={C.warning}>
             <div className="space-y-2">
               {[
-                { name: 'IRONMAN', vram: 192, color: C.warning, net: '100GbE' },
-                { name: 'IRON-PATRIOT', vram: 96, color: C.purple, net: '100GbE' },
-                { name: 'JERICHO', vram: 96, color: C.purple, net: '100GbE' },
+                { name: 'IRONMAN', vram: 192, color: C.warning, net: '10GbE' },
+                { name: 'IRON-PATRIOT', vram: 96, color: C.purple, net: '2.5GbE' },
+                { name: 'JERICHO', vram: 96, color: C.purple, net: '2.5GbE' },
                 { name: 'SENTINEL', vram: 32, color: C.pink, net: '2.5GbE' },
                 { name: 'JARVIS (colo)', vram: 96, color: '#10b981', net: 'VPN' },
               ].map(m => (
@@ -208,10 +208,10 @@ export function LogicalView() {
               ))}
               <div className="flex items-center justify-between pt-2 border-t" style={{ borderColor: C.border }}>
                 <span className="text-[10px] font-bold" style={{ color: C.warning }}>LOCAL FLEET TOTAL</span>
-                <span className="text-xs font-bold" style={{ color: C.warning }}>432GB VRAM</span>
+                <span className="text-xs font-bold" style={{ color: C.warning }}>416GB VRAM (local) + 96GB colo</span>
               </div>
-              <div className="text-[10px]" style={{ color: C.green100g }}>
-                384GB on 100GbE fabric • 32GB on 2.5GbE LAN • +96GB colo via VPN
+              <div className="text-[10px]" style={{ color: C.cyan10g }}>
+                192GB on 10GbE + 192GB on 2.5GbE + 32GB on 2.5GbE • 100GbE fabric pending
               </div>
             </div>
           </Section>

@@ -190,7 +190,7 @@ function BocaLabDetail({ activeModal, openModal }: SiteDetailProps) {
         'RAM: 256GB DDR5 ECC RDIMM (4×64GB)',
         'GPU: 2× RTX PRO 6000 Blackwell 96GB (192GB NVLink VRAM)',
         'SSD: 2× 4TB Samsung 990 PRO Gen4 NVMe',
-        'NIC1: 10GbE → MS510TXUP  •  NIC2: CX-5 VPI 100GbE → SN2100',
+        'NIC1: Marvell 10GbE → MS510 (192.168.1.43)  •  NIC2: Realtek 2.5GbE (192.168.1.50)  •  CX-5 (disconnected)',
         'Role: Flagship inference, Cursor, Claude Desktop',
         'Power: ~350W idle / ~1300W peak  •  PSU: 1650W 80+ Titanium',
       ])}
@@ -240,16 +240,16 @@ function BocaLabDetail({ activeModal, openModal }: SiteDetailProps) {
         'RAM: 128GB DDR5',
         'GPU: RTX PRO 6000 Blackwell 96GB',
         'SSD: 4TB Gen5 + 2×4TB',
-        'NIC1: 2.5GbE → MS510  •  NIC2: CX-5 → SN2100',
-        '10.2.10.71 • TS: 100.75.25.51',
+        'NIC1: 2.5GbE → MS510  •  NIC2: CX-5 (disconnected)',
+        '192.168.1.42 • TS: 100.75.25.51',
       ])}
       {c('jericho', 445, 555, 355, 135, [
         'CPU: Intel Ultra 9 285K',
         'RAM: 128GB DDR5',
         'GPU: RTX PRO 6000 Blackwell 96GB',
         'SSD: 4TB Gen5 + 2×4TB',
-        'NIC1: 2.5GbE → MS510  •  NIC2: CX-5 → SN2100',
-        '10.2.10.35 • TS: 100.85.6.71',
+        'NIC1: 2.5GbE → MS510  •  NIC2: CX-5 (disconnected)',
+        '192.168.1.39 • TS: 100.85.6.71',
       ])}
       {c('sentinel', 830, 555, 330, 135, [
         'CPU: AMD Ryzen 9 9950X3D 16C/32T',
@@ -257,7 +257,7 @@ function BocaLabDetail({ activeModal, openModal }: SiteDetailProps) {
         'GPU: RTX 5090 32GB',
         'SSD: 4TB + 3TB (6.4TB total)',
         'NIC: Realtek 2.5GbE → MS510TXUP',
-        '10.2.10.70 • TS: 100.98.251.57',
+        '192.168.1.40 • TS: 100.98.251.57',
       ])}
 
       {/* === ER4 VPN Gateway === */}
@@ -393,10 +393,10 @@ function SimpleSiteDetail({ siteId, activeModal, openModal }: SiteDetailProps) {
       'Ollama local + SSH tunnel to JARVIS colo',
     ],
     'happy': [
-      'Home Desktop • E2E Test Runner',
-      'NIC: 2.5GbE → MS510 • 10.2.10.112',
+      'Home Desktop (Atlanta) • E2E Test Runner',
+      'NIC: Killer E2600 1GbE • 10.1.10.243 (home network)',
       'Playwright E2E • NSSM services',
-      'Own Vertiv UPS (900W)',
+      'Not on MS510TXUP — remote via Tailscale only',
       'TS: 100.87.48.124',
     ],
     'starktower': [
