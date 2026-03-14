@@ -78,6 +78,7 @@ const nodeColors = {
   observe:  { bg: 'rgba(45,212,191,0.12)',  border: 'rgba(45,212,191,0.35)',  title: '#5eead4' },
   muted:    { bg: 'rgba(100,116,139,0.1)',  border: 'rgba(100,116,139,0.3)',  title: '#94a3b8' },
   category: { bg: 'rgba(167,139,250,0.12)', border: 'rgba(167,139,250,0.35)', title: '#c4b5fd' },
+  ai:       { bg: 'rgba(129,140,248,0.15)', border: 'rgba(129,140,248,0.4)',  title: '#a5b4fc' },
 }
 
 function Arrow() {
@@ -146,6 +147,7 @@ const legendItems = [
   { color: '#f87171', label: 'CI / CD' },
   { color: '#fb923c', label: 'Quality Gates' },
   { color: '#2dd4bf', label: 'Observability' },
+  { color: '#818cf8', label: 'AI / ML' },
 ]
 
 /* ── Category Card ────────────────────────────────────────── */
@@ -289,7 +291,7 @@ export function TestingView() {
           <span style={{ color: C.textBright }}>Process &amp; Architecture</span>
         </h2>
         <p className="text-xs mt-1" style={{ color: C.textDim }}>
-          Playwright-based end-to-end testing pipeline: fixture-driven, cross-browser, CI-integrated
+          Playwright-based end-to-end testing pipeline: fixture-driven, cross-browser, CI-integrated, AI-augmented
         </p>
       </div>
 
@@ -526,8 +528,16 @@ export function TestingView() {
           <Node icon="📏" title="Perf Annotations" detail="Tests annotate perf metrics (load times, LCP, TTFB). Custom reporter collects annotations for trend analysis." variant="observe" />
         </div>
 
+        <div className="h-3" />
+
+        <div className="flex justify-center gap-3 flex-wrap">
+          <Node icon="⏳" title="Content-Ready Waits" detail="waitForFunction() body content checks replace flaky networkidle. Sidebar isVisible(timeout:15s) for SPA apps. Eliminates loading spinner false failures." variant="guard" />
+          <Node icon="🔬" title="API-Only Verification" detail="CRUD tests use Supabase API fallback when RLS blocks UI visibility of service_role-created records or Netlify 404 blocks SPA deep links." variant="guard" />
+          <Node icon="📊" title="Per-App Thresholds" detail="Performance tests use app-specific thresholds (e.g., CRM 80% heap growth vs default 30%). Warm-up navigation + double GC before measurement." variant="observe" />
+        </div>
+
         <div className="mt-2">
-          <Sub>Zero false positives by design: 522 guards + data resilience + SPA-aware navigation + cleanup guarantees</Sub>
+          <Sub>Zero false positives by design: 522 guards + content-ready waits + SPA-aware navigation + API verification fallbacks + per-app perf thresholds + cleanup guarantees</Sub>
         </div>
       </Phase>
 
@@ -555,6 +565,37 @@ export function TestingView() {
           <Sub highlight={C.teal}>
             <strong style={{ color: '#5eead4' }}>Output Pipeline:</strong>
             {' Playwright test run → 3 reporters (HTML + list + JSON) → CI artifact upload → test-summary.json for dashboards & trend analysis'}
+          </Sub>
+        </div>
+      </Phase>
+
+      <Arrow />
+
+      {/* ── PHASE 9 — AI-Powered Testing Engine ────────── */}
+      <Phase label="Phase 9 — AI-Powered Testing Engine" color="#818cf8">
+        <div className="flex justify-center gap-3 flex-wrap mb-3">
+          <Node icon="🩹" title="Self-Healing Locators" detail="Auto-adapts to UI changes with fallback selector chains. Heal cache remembers successful fallbacks for next run. HealingPage wrapper auto-generates fallbacks from DOM." file="lib/self-healing.js" variant="ai" />
+          <Node icon="👁️" title="AI Visual Validation" detail="Perceptual visual comparison via Ollama llava:13b vision model on Sentinel GPU. Goes beyond pixel-diff — understands layout, spacing, and UX regressions." file="lib/ai-visual.js" variant="ai" />
+          <Node icon="✍️" title="NLP Test Generator" detail="Plain English descriptions → production-ready Playwright specs via Claude API. Injects fixture data and conventions for accurate code generation." file="scripts/ai-test-generator.js" variant="ai" />
+        </div>
+
+        <div className="flex justify-center gap-3 flex-wrap">
+          <Node icon="🔎" title="AI Coverage Analyzer" detail="Scans all 9 apps for untested routes, missing categories, role gaps, and low test density. Claude API primary, Ollama qwen3:32b fallback." file="scripts/ai-coverage-analyzer.js" variant="ai" />
+          <Node icon="📉" title="Flakiness Analyzer" detail="Ingests test-summary.json runs, categorizes failures (env/timing/auth/data), tracks patterns over time. AI root cause analysis via Ollama." file="lib/flakiness-analyzer.js" variant="ai" />
+        </div>
+
+        <div className="h-3" />
+
+        <div className="flex justify-center gap-2 flex-wrap">
+          <Badge color="#818cf8">Ollama llava:13b on Sentinel (RTX 5090)</Badge>
+          <Badge color="#818cf8">Claude API for code generation</Badge>
+          <Badge color="#818cf8">Ollama qwen3:32b for analysis</Badge>
+        </div>
+
+        <div className="mt-2">
+          <Sub highlight="#818cf8">
+            <strong style={{ color: '#a5b4fc' }}>AI Infrastructure:</strong>
+            {' Self-healing locators reduce maintenance burden · Vision model catches UX regressions pixel-diff misses · NLP generator accelerates test authoring · Coverage + flakiness analysis closes gaps automatically'}
           </Sub>
         </div>
       </Phase>
@@ -602,15 +643,15 @@ export function TestingView() {
             <div className="w-0.5 h-8" style={{ background: 'rgba(255,255,255,0.15)' }} />
           </div>
 
-          {/* Row 3: Report */}
+          {/* Row 3: AI + Report */}
           <div className="flex items-start justify-center gap-2 flex-wrap">
-            <FlowStep step="9" title="Collect Results" detail="3 reporters" color={C.teal} />
+            <FlowStep step="9" title="AI Analysis" detail="Self-heal + visual AI" color="#818cf8" />
             <FlowArrow />
-            <FlowStep step="10" title="Upload Artifacts" detail="HTML + screenshots" color={C.teal} />
+            <FlowStep step="10" title="Collect Results" detail="3 reporters" color={C.teal} />
             <FlowArrow />
-            <FlowStep step="11" title="Cleanup Data" detail="[E2E] sweep" color={C.orange} />
+            <FlowStep step="11" title="Upload Artifacts" detail="HTML + screenshots" color={C.teal} />
             <FlowArrow />
-            <FlowStep step="12" title="JSON Summary" detail="Per-app/category stats" color={C.teal} />
+            <FlowStep step="12" title="Cleanup & Summary" detail="[E2E] sweep + JSON" color={C.orange} />
           </div>
         </div>
       </div>
@@ -646,6 +687,8 @@ export function TestingView() {
               <ConventionRow icon="⏭️" title="Skipping" detail="test.skip(true, reason) — never silent. 522 guard + feature-gate detection" />
               <ConventionRow icon="🧹" title="Cleanup" detail="[E2E] prefix + FK-aware deletion order + globalTeardown sweep" />
               <ConventionRow icon="📊" title="Annotations" detail="test.info().annotations.push() for perf data and metadata" />
+              <ConventionRow icon="🧠" title="Perf measurement" detail="PerformanceObserver setup BEFORE interaction, read AFTER. Double GC + warm-up for heap tests" />
+              <ConventionRow icon="🩹" title="Self-healing" detail="createHealingLocator() with fallback chains. .heal-cache.json persists across runs" />
             </div>
           </div>
         </div>

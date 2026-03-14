@@ -258,7 +258,7 @@ const estimatedTotalTests = totalSpecFiles * 5
 /* ── Export ────────────────────────────────────────────────── */
 
 export const TESTING_STATS: TestSummary = {
-  lastUpdated: '2026-03-12T00:00:00Z',
+  lastUpdated: '2026-03-14T00:00:00Z',
   totals: {
     specFiles: 159,         // Verified count from kaycha-tests
     tests: 750,             // Approximate from reporter output
@@ -315,5 +315,10 @@ export const TEST_SCRIPTS: { cmd: string; description: string }[] = [
   { cmd: 'test:security',   description: 'Headers, session, input sanitization' },
   { cmd: 'test:resilience', description: 'Network errors, offline, rate limiting' },
   { cmd: 'test:edge-cases', description: 'Unicode, pagination, concurrent ops' },
+  { cmd: 'test:ai-visual',  description: 'AI visual validation (Ollama llava:13b)' },
+  { cmd: 'test:ai-visual:update', description: 'Update AI visual baselines' },
+  { cmd: 'generate:test',   description: 'NLP→Playwright spec generator (Claude API)' },
+  { cmd: 'analyze:coverage', description: 'AI coverage gap analysis (all 9 apps)' },
+  { cmd: 'analyze:flakiness', description: 'Flakiness pattern analyzer with AI root cause' },
   { cmd: 'test:report',     description: 'Open last HTML report in browser' },
 ]
