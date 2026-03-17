@@ -276,14 +276,36 @@ export function PipelineView() {
       <Arrow />
 
       {/* ── PHASE 7 ─────────────────────────────────────── */}
-      <Phase label="Phase 7 — Results Sync" color={C.warning}>
+      <Phase label="Phase 7 — Results Sync + Push" color={C.warning}>
         <HFlow>
-          <Node icon="💾" title="Worker Output" detail="Code changes, review verdicts, test results written to jarvis_ops.tasks metadata" variant="dispatch" />
+          <Node icon="💾" title="Worker Output" detail="Code changes committed + pushed to main. Review verdicts written to jarvis_ops.tasks metadata." variant="dispatch" />
           <HArrow />
           <Node icon="🔄" title="TaskBridge SyncBack" detail="Mirrors status back to KaychaExec pm_tasks. Keeps both DBs in sync." file="bridge/sync-back.ts" variant="bridge" />
           <HArrow />
           <Node icon="💬" title="Discord Notifications" detail="Per-worker channels. Task completion, failures, cycle summaries via webhook." file="Discord Bot Framework" variant="discord" />
         </HFlow>
+      </Phase>
+
+      <Arrow />
+
+      {/* ── PHASE 7b ─────────────────────────────────────── */}
+      <Phase label="Phase 7b — Post-Push: Docs + Dependency Tree + Test Dispatch" color="#f43f5e">
+        <Sub><strong style={{ color: '#fb7185' }}>Trigger:</strong> Worker pushes to main → CI passes → index.yml workflow fires automatically</Sub>
+        <div className="mt-2">
+          <HFlow>
+            <Node icon="📖" title="Doc Generator" detail="Rebuilds API.md, CONFIG.md, SCHEMA.md, ARCHITECTURE.md from source. Commits with [skip ci]." file="doc-generator.ts" variant="cicd" />
+            <HArrow />
+            <Node icon="🕸️" title="Dependency Tree Update" detail="Incremental graph_ingest — parses imports, updates code_nodes + code_edges in Supabase." file="graph_ingest.py --incremental" variant="cicd" />
+            <HArrow />
+            <Node icon="🧪" title="Test Dispatch" detail="Classifies changed files, generates e2e_test tasks, dispatches to HAPPY. Deduplicates pending." file="test_orchestrator.py" variant="cicd" />
+          </HFlow>
+        </div>
+        <div className="mt-2">
+          <Sub highlight="#f43f5e">
+            <strong style={{ color: '#fb7185' }}>This ensures:</strong>
+            {' docs are always current, dependency graph reflects latest code, and tests are dispatched for every code change — all before the next QUBO cycle picks up results'}
+          </Sub>
+        </div>
       </Phase>
 
       <Arrow />
@@ -388,45 +410,6 @@ export function PipelineView() {
             <strong style={{ color: '#5eead4' }}>Learning Loop:</strong>
             {' Every task execution → memory_write extracts decisions & patterns → stored in jarvis_memory → future QUBO cycles benefit from accumulated knowledge via rag_optimize / memory_optimize'}
           </Sub>
-        </div>
-      </Phase>
-
-      <Arrow />
-
-      {/* ── PHASE 11 ────────────────────────────────────── */}
-      <Phase label="Phase 11 — Post-Push CI/CD Pipeline (IP-007)" color="#f43f5e">
-        <Sub><strong style={{ color: '#fb7185' }}>Triggered:</strong> After CI passes on main (GitHub Actions workflow_run)</Sub>
-
-        {/* CI Stage */}
-        <div className="mt-2 mb-3">
-          <HFlow>
-            <Node icon="📤" title="git push → main" detail="Developer or autofix agent pushes code to main branch" variant="cicd" />
-            <HArrow />
-            <Node icon="🔨" title="CI Pipeline" detail="TypeScript lint + build, pnpm audit, pip-audit, pytest (160 tests)" file=".github/workflows/ci.yml" variant="cicd" />
-            <HArrow />
-            <Node icon="🚀" title="Fleet Deploy" detail="Self-hosted runner (sentinel). SSH to all machines, NSSM restart." file=".github/workflows/deploy.yml" variant="cicd" />
-          </HFlow>
-        </div>
-
-        <div className="flex justify-center items-center gap-4 py-1">
-          <Badge color="#f43f5e">After CI passes →</Badge>
-        </div>
-
-        {/* Index Workflow */}
-        <HFlow>
-          <Node icon="📖" title="docs:build" detail="Auto-regenerate API.md, CONFIG.md, SCHEMA.md, ARCHITECTURE.md from source" file="doc-generator.ts" variant="cicd" />
-          <HArrow />
-          <Node icon="🕸️" title="Graph Ingest" detail="Incremental import parsing. Updates code_nodes + code_edges in Supabase. Feeds QUBO dependency context." file="graph_ingest.py --incremental" variant="cicd" />
-          <HArrow />
-          <Node icon="🧪" title="Test Orchestrator" detail="Classifies changed files. Generates e2e_test tasks. Dispatches to Happy. Deduplicates pending tests." file="test_orchestrator.py --dispatch" variant="cicd" />
-        </HFlow>
-
-        <div className="mt-2 space-y-0.5">
-          <Sub highlight="#f43f5e">
-            <strong style={{ color: '#fb7185' }}>Index Workflow:</strong>
-            {' push → CI → deploy → docs regen → graph update → test dispatch → Happy runs tests → feedback loop → autofix if needed → iterate'}
-          </Sub>
-          <Sub><strong>Auto-commit:</strong> Regenerated docs committed with [skip ci] to prevent infinite loops. Graph ingest runs on self-hosted sentinel runner.</Sub>
         </div>
       </Phase>
 
