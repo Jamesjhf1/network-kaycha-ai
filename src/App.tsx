@@ -5,10 +5,11 @@ import { PowerView } from './views/PowerView'
 import { PipelineView } from './views/PipelineView'
 import { TestingView } from './views/TestingView'
 import { MemoryView } from './views/MemoryView'
+import { RagView } from './views/RagView'
 
 import { FooterStats } from './components/FooterStats'
 
-type Tab = 'physical' | 'logical' | 'power' | 'pipeline' | 'testing' | 'memory'
+type Tab = 'physical' | 'logical' | 'power' | 'pipeline' | 'testing' | 'memory' | 'rag'
 
 const tabs: { id: Tab; label: string; icon: string }[] = [
   { id: 'physical', label: 'Physical', icon: '⬡' },
@@ -17,6 +18,7 @@ const tabs: { id: Tab; label: string; icon: string }[] = [
   { id: 'pipeline', label: 'Pipeline', icon: '▷' },
   { id: 'testing', label: 'Testing', icon: '🧪' },
   { id: 'memory', label: 'Memory', icon: '◉' },
+  { id: 'rag', label: 'RAG', icon: '◎' },
 ]
 
 export default function App() {
@@ -62,6 +64,7 @@ export default function App() {
           {activeTab === 'pipeline' && <PipelineView />}
           {activeTab === 'testing' && <TestingView />}
           {activeTab === 'memory' && <MemoryView />}
+          {activeTab === 'rag' && <RagView />}
         </div>
       </main>
 
