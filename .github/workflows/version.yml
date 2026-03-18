@@ -1,0 +1,37 @@
+name: Version
+on:
+  push:
+    branches: [main]
+concurrency:
+  group: version-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: write
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    if: "!startsWith(github.event.head_commit.message, 'chore: release')"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Determine version bump
+        id: bump
+        run: |
+          MSG=$(git log --oneline -1)
+          if echo "$MSG" | grep -qiE "^(feat|minor)"; then
+            echo "type=minor" >> $GITHUB_OUTPUT
+          elif echo "$MSG" | grep -qiE "^(break|major|!)"; then
+            echo "type=major" >> $GITHUB_OUTPUT
+          else
+            echo "type=patch" >> $GITHUB_OUTPUT
+          fi
+      - name: Bump and tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          npm version ${{ steps.bump.outputs.type }} -m "chore: release v%s"
+          git push --follow-tags
