@@ -34,13 +34,6 @@ function Node({ icon, title, detail, file, variant }: {
   )
 }
 
-function WideNode({ icon, title, detail, file, variant }: {
-  icon: string; title: string; detail: string; file?: string
-  variant: keyof typeof nodeColors
-}) {
-  return <div className="min-w-[240px] max-w-[320px]"><Node icon={icon} title={title} detail={detail} file={file} variant={variant} /></div>
-}
-
 const nodeColors = {
   client:   { bg: 'rgba(139,92,246,0.15)', border: 'rgba(139,92,246,0.4)',  title: '#c4b5fd' },
   mcp:      { bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.35)', title: '#93c5fd' },
@@ -54,6 +47,8 @@ const nodeColors = {
   embed:    { bg: 'rgba(129,140,248,0.12)',border: 'rgba(129,140,248,0.35)',title: '#a5b4fc' },
   muted:    { bg: 'rgba(100,116,139,0.1)', border: 'rgba(100,116,139,0.3)', title: '#94a3b8' },
   sisyphus: { bg: 'rgba(236,72,153,0.12)', border: 'rgba(236,72,153,0.35)', title: '#f9a8d4' },
+  bench:    { bg: 'rgba(251,146,60,0.12)', border: 'rgba(251,146,60,0.35)', title: '#fdba74' },
+  api:      { bg: 'rgba(129,140,248,0.12)',border: 'rgba(129,140,248,0.35)',title: '#a5b4fc' },
 }
 
 function Arrow() {
@@ -110,6 +105,14 @@ function InfoBlock({ title, color, items }: { title: string; color: string; item
   )
 }
 
+function CodeBlock({ children, color }: { children: React.ReactNode; color: string }) {
+  return (
+    <div className="rounded-lg border p-4 font-mono text-[11px] leading-relaxed" style={{ background: color + '08', borderColor: color + '20', color }}>
+      {children}
+    </div>
+  )
+}
+
 /* ── Legend ───────────────────────────────────────────────── */
 
 const legendItems = [
@@ -122,6 +125,7 @@ const legendItems = [
   { color: '#fdba74', label: 'Feedback Loop' },
   { color: '#f472b6', label: 'Session Continuity' },
   { color: '#ec4899', label: 'Sisyphus Integration' },
+  { color: '#fb923c', label: 'Benchmarks' },
 ]
 
 /* ── Main View ───────────────────────────────────────────── */
@@ -147,12 +151,13 @@ export function MemoryView() {
 
       {/* Stats Bar */}
       <div className="flex gap-3 flex-wrap justify-center">
-        <StatCard value="12" label="MCP Tools" color={C.blue} />
-        <StatCard value="11" label="API Endpoints" color={C.green100g} />
+        <StatCard value="8" label="MCP Tools" color={C.blue} />
+        <StatCard value="8" label="API Endpoints" color={C.green100g} />
         <StatCard value="8" label="BQM Terms" color={C.teal} />
         <StatCard value="3" label="Domains" color={C.orange} />
         <StatCard value="768d" label="Embedding Dim" color={C.purple} />
-        <StatCard value="<200ms" label="Write Latency" color={C.pink} />
+        <StatCard value="~2.5s" label="Full Pipeline" color={C.pink} />
+        <StatCard value="281K" label="RAG Chunks" color={C.accent} />
       </div>
 
       {/* ── Phase 0: Client Layer ─────────────────────────── */}
@@ -164,51 +169,79 @@ export function MemoryView() {
         </HFlow>
         <div className="text-[10px] text-center mt-3" style={{ color: C.textDim }}>
           All clients connect via mcp-remote to IRON-PATRIOT:8104 (SSE). Each connection gets its own MCP server instance.
+          Transports: stdio (Claude Code default), SSE (Claude Desktop / Cursor / browser IDE).
         </div>
       </Phase>
 
       <Arrow />
 
       {/* ── Phase 1: MCP + Write Pipeline ─────────────────── */}
-      <Phase label="Phase 1 - MCP Layer + Write Pipeline" color="#60a5fa">
+      <Phase label="Phase 1 - MCP Layer + Write Pipeline (8 Tools)" color="#60a5fa">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-3">
             <div className="text-[11px] font-semibold mb-2" style={{ color: '#93c5fd' }}>Read Tools (Retrieval)</div>
             <HFlow>
-              <Node icon="Q" title="memory_optimize" detail="Full QUBO pipeline - both sources" variant="mcp" />
-              <Node icon="R" title="rag_context" detail="Pre-formatted context string" variant="mcp" />
+              <Node icon="Q" title="memory_optimize" detail="Full QUBO pipeline - both sources" file="POST /memory/optimize" variant="mcp" />
+              <Node icon="R" title="rag_context" detail="Pre-formatted context string" file="POST /rag/context" variant="mcp" />
             </HFlow>
             <HFlow>
-              <Node icon="O" title="rag_optimize" detail="RAG-only shortcut" variant="mcp" />
-              <Node icon="C" title="optimize_chunks" detail="Optimize pre-fetched chunks" variant="mcp" />
+              <Node icon="O" title="rag_optimize" detail="RAG-only shortcut" file="POST /rag/optimize" variant="mcp" />
+              <Node icon="C" title="optimize_chunks" detail="Optimize pre-fetched chunks" file="POST /memory/optimize-chunks" variant="mcp" />
             </HFlow>
           </div>
           <div className="space-y-3">
-            <div className="text-[11px] font-semibold mb-2" style={{ color: '#93c5fd' }}>Write Tools (Persistence)</div>
+            <div className="text-[11px] font-semibold mb-2" style={{ color: '#93c5fd' }}>Write + Adaptive Tools</div>
             <HFlow>
-              <Node icon="+" title="memory_remember" detail="Mid-conversation write (<100ms)" file="Phase 1" variant="store" />
-              <Node icon="W" title="memory_write" detail="Session-end decision extraction" variant="mcp" />
+              <Node icon="W" title="memory_write" detail="Session-end decision extraction" file="POST /memory/write" variant="mcp" />
+              <Node icon="H" title="memory_health" detail="Service health + subsystem stats" file="GET /memory/health" variant="muted" />
             </HFlow>
+            <div className="text-[11px] font-semibold mb-2 mt-3" style={{ color: '#f9a8d4' }}>Adaptive Recall (Sisyphus)</div>
             <HFlow>
-              <Node icon="F" title="memory_feedback" detail="Log chunk utilization" file="Phase 3" variant="feedback" />
-              <Node icon="H" title="memory_health" detail="Service health + all subsystem stats" variant="muted" />
-            </HFlow>
-            <div className="text-[11px] font-semibold mb-2 mt-3" style={{ color: '#f9a8d4' }}>Adaptive Recall (Phase 7 - Sisyphus)</div>
-            <HFlow>
-              <Node icon="!" title="memory_recall_interrupt" detail="Surprise-driven targeted recall when stuck" file="Phase 7" variant="sisyphus" />
-              <Node icon="B" title="memory_update_bitmask" detail="Report loaded chunks for delta-only recall" file="Phase 7" variant="sisyphus" />
+              <Node icon="!" title="memory_recall_interrupt" detail="Surprise-driven targeted recall when stuck" file="POST /memory/recall-interrupt" variant="sisyphus" />
+              <Node icon="B" title="memory_update_bitmask" detail="Report loaded chunks for delta-only" file="POST /memory/update-bitmask" variant="sisyphus" />
             </HFlow>
           </div>
         </div>
-        <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-          <Node icon="E" title="entity_get" detail="Entity + N-hop graph expansion" file="Phase 4" variant="entity" />
-          <Node icon="R" title="entity_relate" detail="Create typed relationships" file="Phase 4" variant="entity" />
-          <Node icon="S" title="entity_search" detail="Fuzzy FTS5 entity search" file="Phase 4" variant="entity" />
-        </div>
-        <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-          <Node icon="1" title="session_start" detail="Begin tracked session" file="Phase 5" variant="session" />
-          <Node icon="A" title="session_attempt" detail="Log attempt + outcome" file="Phase 5" variant="session" />
-          <Node icon="H" title="session_handoff" detail="Generate handoff context" file="Phase 5" variant="session" />
+
+        {/* API Signatures */}
+        <div className="mt-4 space-y-3">
+          <div className="text-[11px] font-semibold" style={{ color: '#93c5fd' }}>Tool Signatures (TypeScript)</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <CodeBlock color="#60a5fa">
+              <div style={{ color: '#93c5fd' }}>{'// memory_optimize'}</div>
+              <div>{'{'} query: string</div>
+              <div>{'  '}max_tokens?: 100-32000 <span style={{ color: 'rgba(255,255,255,0.3)' }}>{'// default 4000'}</span></div>
+              <div>{'  '}max_chunks?: 1-100 <span style={{ color: 'rgba(255,255,255,0.3)' }}>{'// default 20'}</span></div>
+              <div>{'  '}sources?: ["jarvis_memory","jarvis_rag"]</div>
+              <div>{'  '}collection_weights?: {'{'} jarvis_schemas: 1.5 {'}'} {'}'}</div>
+              <div style={{ color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>{'// Returns: selected_chunks[], energy, timing_ms, solver_used'}</div>
+            </CodeBlock>
+            <CodeBlock color="#ec4899">
+              <div style={{ color: '#f9a8d4' }}>{'// memory_recall_interrupt'}</div>
+              <div>{'{'} session_id: string</div>
+              <div>{'  '}agent_context: string <span style={{ color: 'rgba(255,255,255,0.3)' }}>{'// ~500 tokens'}</span></div>
+              <div>{'  '}failure_context: string</div>
+              <div>{'  '}D?: number <span style={{ color: 'rgba(255,255,255,0.3)' }}>{'// Sisyphus divergence 0-1'}</span> {'}'}</div>
+              <div style={{ color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>{'// Returns: triggered, new_chunks[] (delta), evicted[], hypothesis'}</div>
+            </CodeBlock>
+            <CodeBlock color="#60a5fa">
+              <div style={{ color: '#93c5fd' }}>{'// memory_write'}</div>
+              <div>{'{'} output: string <span style={{ color: 'rgba(255,255,255,0.3)' }}>{'// max 100KB'}</span></div>
+              <div>{'  '}repo?: string, task_id?: string</div>
+              <div>{'  '}files_touched?: string[]</div>
+              <div>{'  '}source?: "claude_session" | "jarvis_pipeline"</div>
+              <div>{'  '}min_confidence?: 0-1 <span style={{ color: 'rgba(255,255,255,0.3)' }}>{'// default 0.6'}</span> {'}'}</div>
+              <div style={{ color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>{'// Returns: extracted, stored, skipped, entries[]'}</div>
+            </CodeBlock>
+            <CodeBlock color="#ec4899">
+              <div style={{ color: '#f9a8d4' }}>{'// memory_update_bitmask'}</div>
+              <div>{'{'} session_id: string</div>
+              <div>{'  '}loaded_chunk_ids: string[] {'}'}</div>
+              <div style={{ color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>{'// Returns: bitmask state, total_loaded'}</div>
+              <div style={{ color: 'rgba(255,255,255,0.3)' }}>{'// Call after every rag_context / memory_optimize'}</div>
+              <div style={{ color: 'rgba(255,255,255,0.3)' }}>{'// Ensures future calls return delta-only'}</div>
+            </CodeBlock>
+          </div>
         </div>
       </Phase>
 
@@ -260,17 +293,17 @@ export function MemoryView() {
           {/* Retrieval */}
           <div className="text-[11px] font-semibold" style={{ color: '#6ee7b7' }}>1. Retrieval (parallel, circuit-breaker protected)</div>
           <HFlow>
-            <Node icon="M" title="jarvis_memory" detail="CF Worker FTS - decisions, patterns" variant="store" />
+            <Node icon="M" title="jarvis_memory" detail="CF Worker FTS - decisions, patterns" file="222-428ms latency" variant="store" />
             <HArrow />
-            <Node icon="R" title="jarvis_rag" detail="ChromaDB - 7 collections, 768d embeddings" variant="store" />
+            <Node icon="R" title="jarvis_rag" detail="ChromaDB - 7 collections, 281K chunks" file="100-500ms latency" variant="store" />
             <HArrow />
-            <Node icon="G" title="Entity Graph" detail="SQLite + NetworkX - N-hop expansion" variant="entity" />
+            <Node icon="G" title="Entity Graph" detail="SQLite + NetworkX - N-hop expansion" file="92 nodes, 209 edges" variant="entity" />
           </HFlow>
 
           {/* Scoring */}
           <div className="text-[11px] font-semibold mt-3" style={{ color: '#6ee7b7' }}>2. Scoring (vectorized, domain-weighted)</div>
           <HFlow>
-            <Node icon="E" title="Embeddings" detail="nomic-embed-text 768d via Ollama, batch=50" variant="embed" />
+            <Node icon="E" title="Embeddings" detail="nomic-embed-text 768d via Ollama, batch=64" file="SENTINEL:11434" variant="embed" />
             <HArrow />
             <Node icon="P" title="Pairwise Similarity" detail="Vectorized matmul (normalized @ normalized.T)" variant="embed" />
             <HArrow />
@@ -280,17 +313,17 @@ export function MemoryView() {
           {/* BQM */}
           <div className="text-[11px] font-semibold mt-3" style={{ color: '#6ee7b7' }}>3. BQM Construction (8-term energy function)</div>
           <div className="rounded-lg border p-4 font-mono text-[11px] leading-relaxed" style={{ background: 'rgba(52,211,153,0.05)', borderColor: 'rgba(52,211,153,0.15)', color: '#6ee7b7' }}>
-            <div>H = <span style={{ color: '#fca5a5' }}>-alpha</span> SUM(rel_i * s_i)</div>
-            <div className="ml-4">+ <span style={{ color: '#fcd34d' }}>beta</span> SUM(sim_ij * s_i * s_j)</div>
-            <div className="ml-4">+ <span style={{ color: '#93c5fd' }}>gamma</span> (SUM(tok_i * s_i) - B)^2</div>
-            <div className="ml-4">- <span style={{ color: '#5eead4' }}>delta</span> SUM(fresh_i * s_i)</div>
+            <div>H = <span style={{ color: '#fca5a5' }}>-alpha(5.0)</span> SUM(rel_i * s_i)</div>
+            <div className="ml-4">+ <span style={{ color: '#fcd34d' }}>beta(3.0)</span> SUM(sim_ij * s_i * s_j)</div>
+            <div className="ml-4">+ <span style={{ color: '#93c5fd' }}>gamma(4.0)</span> (SUM(tok_i * s_i) - B)^2</div>
+            <div className="ml-4">- <span style={{ color: '#5eead4' }}>delta(1.5)</span> SUM(fresh_i * s_i)</div>
             <div className="ml-4">+ <span style={{ color: '#c4b5fd' }}>epsilon</span> per-source cap</div>
             <div className="ml-4">- <span style={{ color: '#fdba74' }}>zeta</span> SUM(dep_pairs s_i * s_j) + Sisyphus bias boost</div>
-            <div className="ml-4">+ <span style={{ color: '#f9a8d4' }}>eta</span> SUM(contradiction_ij * s_i * s_j)</div>
+            <div className="ml-4">+ <span style={{ color: '#f9a8d4' }}>eta(25.0)</span> SUM(contradiction_ij * s_i * s_j)</div>
             <div className="ml-4">- <span style={{ color: '#ec4899' }}>theta</span> SUM(v_i * s_i) + SUM(v_ij * s_i * s_j)  <span style={{ color: '#ec489980' }}>[Bellman]</span></div>
           </div>
           <div className="text-[10px] text-center" style={{ color: C.textDim }}>
-            Terms: relevance, redundancy, budget, freshness, source diversity, dependency coupling + Sisyphus biases, contradiction, Bellman value (learned future utility via TD(λ))
+            Config: num_reads=50, early_stopping=true, warm_start_threshold=0.35, auto_scale=false
           </div>
 
           {/* Solver */}
@@ -302,6 +335,7 @@ export function MemoryView() {
           </HFlow>
           <div className="text-[10px] text-center" style={{ color: C.textDim }}>
             Best energy wins. Warm-start from prior solutions via SHA-256 cache key. Solution cached for reuse.
+            Typical solve time: 1-31 seconds. Fallback: degraded mode with flag set if solver unavailable.
           </div>
         </div>
       </Phase>
@@ -329,6 +363,10 @@ export function MemoryView() {
               'Same metric + same period + >10% divergence = contradiction',
             ]} />
           </div>
+        </div>
+        <div className="mt-3 text-[10px]" style={{ color: C.textDim }}>
+          <span style={{ color: '#f87171' }}>Gap vs CML-MIC:</span> JARVIS handles contradictions implicitly via BQM Term 2 (redundancy) + Term 4 (freshness).
+          CML-MIC has a full 6-rule deterministic engine (CR-01→CR-06) with a human review queue. P0 roadmap item: adopt CR-01 pair matching.
         </div>
       </Phase>
 
@@ -360,13 +398,15 @@ export function MemoryView() {
       <Phase label="Knowledge Graph + Session Continuity" color="#f472b6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Node icon="G" title="Entity Graph" detail="SQLite + NetworkX DiGraph" file="Phase 4" variant="entity" />
+            <Node icon="G" title="Entity Graph" detail="SQLite + NetworkX DiGraph" file="92 nodes, 209 edges (jarvis-ops)" variant="entity" />
             <InfoBlock title="Entity Types" color="#f87171" items={[
               'person, project, codebase, api, decision, bug',
               'pattern, regulation, state, test_method, table',
               'Auto-extracted via regex from memory_remember',
               'Co-occurrence relations between entities in same memory',
               'FTS5 fuzzy search + N-hop traversal',
+              'Code graph: recursive CTEs (get_dependencies, get_dependents)',
+              'Incremental indexing via git post-commit hooks',
             ]} />
           </div>
           <div className="space-y-2">
@@ -377,6 +417,7 @@ export function MemoryView() {
               'Auto-generate handoff markdown on session end',
               'Writes to ai-context/handoffs/ for next session pickup',
               'Query prior attempts to avoid repeating failures',
+              'Active workspace: git hook + 4hr TTL + 1.3x relevance boost',
             ]} />
           </div>
         </div>
@@ -395,18 +436,18 @@ export function MemoryView() {
             <Node icon="S" title="Sisyphus MemoryWorld" detail="4 cognitive layers: Recall (degree-3), Sense, Desire, Affordance" file="sisyphus-engine" variant="sisyphus" />
             <InfoBlock title="HOBO Polynomial" color="#ec4899" items={[
               'BinaryPolynomial (degree 2+3) superposition',
-              'Dimensional Slicer: N-D poly → degree-≤2 BQM',
+              'Dimensional Slicer: N-D poly to degree-2 BQM',
               'make_quadratic() for surviving cubic terms',
               'Pinned state propagation across cycles',
             ]} />
           </div>
           <div className="space-y-2">
-            <Node icon="V" title="Bellman Value (Term 8)" detail="TD(λ) trainer: predicts future chunk utility" file="bellman_trainer.py" variant="sisyphus" />
-            <InfoBlock title="TD(λ) Learning" color="#ec4899" items={[
+            <Node icon="V" title="Bellman Value (Term 8)" detail="TD(lambda) trainer: predicts future chunk utility" file="bellman_trainer.py" variant="sisyphus" />
+            <InfoBlock title="TD(lambda) Learning" color="#ec4899" items={[
               'v_i = learned linear value per chunk',
               'v_ij = learned pair value (top-K=3 pruning)',
               'Cold-start: bootstrap + 5-cycle eviction pin',
-              'Age decay: 0.98× per cycle after 200 idle',
+              'Age decay: 0.98x per cycle after 200 idle',
               'Trains every 100 interactions (offline)',
             ]} />
           </div>
@@ -416,7 +457,7 @@ export function MemoryView() {
               'D(t): Sisyphus divergence (context mismatch)',
               'rho(t): semantic distance from memory anchors',
               'epsilon(t): confidence drop signal',
-              'Exponential backoff (1.5× per interrupt)',
+              'Exponential backoff (1.5x per interrupt)',
               'Incremental solve: delta-only, <100ms',
               'Session bitmask: never re-fetch loaded chunks',
             ]} />
@@ -434,10 +475,171 @@ export function MemoryView() {
           ]} />
           <InfoBlock title="Supabase Tables (jarvis_memory)" color="#ec4899" items={[
             'chunk_biases — Sisyphus-verified pairwise biases',
-            'bellman_values — TD(λ) learned v_i and v_ij',
+            'bellman_values — TD(lambda) learned v_i and v_ij',
             'RPC: get_max_bias_seq(), get_chunk_biases()',
             'Monotonic seq_id for staleness detection',
             'BiasWriter: confidence 1.0 (verified) / 0.6 (failsafe)',
+          ]} />
+        </div>
+      </Phase>
+
+      <Arrow />
+
+      {/* ── CF Worker REST API ────────────────────────────── */}
+      <Phase label="Cloudflare Worker REST API (Distributed Memory Operations)" color="#a5b4fc">
+        <div className="text-[10px] text-center mb-3" style={{ color: C.textDim }}>
+          Production API at jarvis-memory-api.kaycha-labs.workers.dev. Bearer token auth on all endpoints.
+          Backpressure: 50 max concurrent, shed at 80% capacity. X-Machine-ID required on writes.
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <InfoBlock title="Context Store" color="#a5b4fc" items={[
+            'POST /context — Store new entry',
+            'GET /context/search?q=... — Full-text search',
+            'GET /context/:hex_id — Retrieve by ID',
+            'PATCH /context/:hex_id — Update entry',
+            'DELETE /context/:hex_id — Delete entry',
+          ]} />
+          <InfoBlock title="Cluster + Locks" color="#a5b4fc" items={[
+            'POST /heartbeat — Register machine heartbeat',
+            'GET /cluster — All machine states',
+            'GET /cluster/leader — Current leader',
+            'POST /locks/acquire — Distributed file lock',
+            'POST /locks/release — Release lock',
+          ]} />
+          <InfoBlock title="Tasks + Logs" color="#a5b4fc" items={[
+            'POST /task-specs — Upsert task spec',
+            'GET /task-specs/:task_id — Get task spec',
+            'POST /feedback — Record task feedback',
+            'POST /logs — Write agent log(s)',
+            'GET /logs?machine_id=... — Query logs',
+          ]} />
+        </div>
+        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <InfoBlock title="context_store Schema" color="#a5b4fc" items={[
+            'hex_id (PK), domain (exec/legal/infra/finance/code/...)',
+            'project, topic, summary, content (TEXT)',
+            'source (machine_id,source_name), machine_id',
+            'ttl_days, expires_at, created_at, updated_at',
+            'Full-text search enabled (wfts index)',
+          ]} />
+          <InfoBlock title="task_feedback Schema" color="#a5b4fc" items={[
+            'task_id, machine_id, outcome (success/failure/partial/timeout)',
+            'execution_time_ms, review_score, test_pass_rate',
+            'validation_passed, energy_at_dispatch',
+            'd_score (Sisyphus divergence), retry_count',
+            'feedback_notes, created_at',
+          ]} />
+        </div>
+      </Phase>
+
+      <Arrow />
+
+      {/* ── Benchmark Results ────────────────────────────────── */}
+      <Phase label="Benchmark Results (March 9, 2026 Audit)" color="#fb923c">
+        <div className="text-[10px] text-center mb-3" style={{ color: C.textDim }}>
+          CML-MIC vs JARVIS Comparative Benchmark — 433-line autonomous audit report.
+          Source: jarvis-ops/reports/CML-MIC-vs-JARVIS-Benchmark-Report-2026-03-09.md
+        </div>
+
+        {/* Latency Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-3">
+            <div className="text-[11px] font-semibold" style={{ color: '#fdba74' }}>Live Performance Metrics</div>
+            <div className="grid grid-cols-2 gap-2">
+              <StatCard value="2.0-2.7s" label="Full Pipeline" color="#fb923c" />
+              <StatCard value="222-428ms" label="CF Worker FTS" color="#34d399" />
+              <StatCard value="100-500ms" label="Vector Search" color="#60a5fa" />
+              <StatCard value="10-50ms" label="BM25 Search" color="#fbbf24" />
+              <StatCard value="<100ms" label="RRF Merge" color="#2dd4bf" />
+              <StatCard value="1-31s" label="QUBO Solve" color="#ec4899" />
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="text-[11px] font-semibold" style={{ color: '#fdba74' }}>Live System Status (Audited)</div>
+            <div className="grid grid-cols-2 gap-2">
+              <StatCard value="281K" label="Total Chunks" color="#34d399" />
+              <StatCard value="7" label="RAG Collections" color="#2dd4bf" />
+              <StatCard value="92" label="Code Graph Nodes" color="#a5b4fc" />
+              <StatCard value="209" label="Code Graph Edges" color="#a5b4fc" />
+              <StatCard value="95%" label="Audit Pass Rate" color="#34d399" />
+              <StatCard value="151/151" label="Health Checks" color="#34d399" />
+            </div>
+          </div>
+        </div>
+
+        {/* Head-to-Head */}
+        <div className="mt-4">
+          <div className="text-[11px] font-semibold mb-2" style={{ color: '#fdba74' }}>Head-to-Head: JARVIS vs CML-MIC PRD v1.2</div>
+          <div className="rounded-lg border overflow-hidden" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+            <table className="w-full text-[10.5px]">
+              <thead>
+                <tr style={{ background: 'rgba(251,146,60,0.08)' }}>
+                  <th className="text-left px-3 py-2 font-semibold" style={{ color: '#fdba74' }}>Dimension</th>
+                  <th className="text-left px-3 py-2 font-semibold" style={{ color: '#fdba74' }}>Winner</th>
+                  <th className="text-left px-3 py-2 font-semibold" style={{ color: '#fdba74' }}>Why</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ['Context Selection', 'JARVIS', '6-term QUBO BQM vs top-K heuristic'],
+                  ['Retrieval Architecture', 'JARVIS', 'Parallel FTS + ChromaDB + QUBO vs two-tier SQL + pgvector'],
+                  ['Conflict Detection', 'CML-MIC', '6-rule deterministic engine vs implicit BQM penalty'],
+                  ['Claim Lifecycle', 'CML-MIC', '7-state machine vs flat TTL expiry'],
+                  ['Knowledge Extraction', 'CML-MIC', 'LLM-powered (8 types) vs regex (5 types)'],
+                  ['Code Dependency', 'JARVIS', '92-node graph + BQM Term 6 vs not addressed'],
+                  ['Workspace Tracking', 'JARVIS', 'Git hook + 4hr TTL + 1.3x boost vs not addressed'],
+                  ['Scale (live data)', 'JARVIS', '281K chunks operational vs theoretical'],
+                  ['Multi-Machine', 'JARVIS', '5 workstations + Tailscale vs single Docker Compose'],
+                ].map(([dim, winner, why], i) => (
+                  <tr key={i} style={{ background: i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
+                    <td className="px-3 py-1.5" style={{ color: C.textBright }}>{dim}</td>
+                    <td className="px-3 py-1.5" style={{ color: winner === 'JARVIS' ? '#34d399' : '#fbbf24' }}>{winner}</td>
+                    <td className="px-3 py-1.5" style={{ color: C.textDim }}>{why}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* QUBO Benchmark Config */}
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <InfoBlock title="QUBO Solver Benchmark Suite" color="#fb923c" items={[
+            'benchmark_qubo.py — BQM build time, solve time, energy, cache hits',
+            'benchmark_suite.py — 6 canonical tasks, SA vs Tabu vs Hybrid comparison',
+            'compliance_qubo_benchmark.py — 10-term Hamiltonian, 8 state compliance',
+            'retrieval_health.py — 5-target health (CF Worker, ChromaDB, Graph, Workspace, Ollama)',
+            '30+ unit tests in qubo/tests/ covering builder, solver, circuit breaker, scheduler',
+          ]} />
+          <InfoBlock title="Known Issues (from benchmark)" color="#f87171" items={[
+            'HIGH: jarvis_schemas HNSW index error ("Nothing found on disk")',
+            'HIGH: Full pipeline 0 candidates on some queries',
+            'MEDIUM: CF Worker FTS returning 0 results (needs re-index)',
+            'LOW: memory_write errors: 3 in dry_run mode',
+            'RESOLVED: Embedding model upgraded 384d -> 768d (nomic-embed-text)',
+          ]} />
+        </div>
+
+        {/* Benchmark Academic Scores */}
+        <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+          <InfoBlock title="LOCOMO (Long-term Memory)" color="#fb923c" items={[
+            'Adversarial: CML-MIC > JARVIS (no explicit contradiction)',
+            'Temporal reasoning: Competitive (BQM Term 4 freshness)',
+            'Multi-session: CML-MIC > JARVIS (flat chunk store)',
+            'Standard retrieval: JARVIS competitive',
+          ]} />
+          <InfoBlock title="LongMemEval (Multi-Session)" color="#fb923c" items={[
+            'Knowledge update: Competitive (implicit freshness)',
+            'Session TTL: CML-MIC (configurable vs fixed 90d)',
+            'Cross-session promotion: CML-MIC > JARVIS (no concept)',
+            'Basic retrieval: JARVIS competitive',
+          ]} />
+          <InfoBlock title="BEAM (Extreme Scale)" color="#fb923c" items={[
+            'Scale: Both handle 100K-10M tokens',
+            'Event ordering: CML-MIC (provenance chain)',
+            'Contradiction at scale: CML-MIC (deterministic rules)',
+            'Retrieval diversity: JARVIS > CML-MIC (QUBO)',
+            'Token optimization: JARVIS > CML-MIC (BQM Term 3)',
           ]} />
         </div>
       </Phase>
@@ -452,23 +654,26 @@ export function MemoryView() {
             ':7472 - Memory Optimizer (Python/FastAPI, NSSM)',
             'SQLite: entity_graph.db, feedback.db, sessions.db',
             'RTX PRO 6000 96GB, 128GB RAM',
+            'MEMORY_OPTIMIZER_URL=http://localhost:7472',
+            'Bearer token: jmopt-0KXmkRGO... (MEMORY_OPTIMIZER_API_KEY)',
           ]} />
           <InfoBlock title="SENTINEL (Hot Backup)" color={C.blue} items={[
             ':7472 - Memory Optimizer (same code, synced data)',
-            'Ollama host for embeddings (nomic-embed-text)',
+            'Ollama host for embeddings (nomic-embed-text 768d)',
             'RTX 5090 32GB, 64GB RAM',
             'Data sync via SCP of SQLite files',
+            'OWU :3000 with 199 model routes',
           ]} />
         </div>
         <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-          <InfoBlock title="ChromaDB Collections (7)" color={C.green100g} items={[
-            'jarvis_documents',
-            'jarvis_code',
-            'jarvis_schemas',
-            'jarvis_knowledge',
-            'jarvis_regulations',
-            'jarvis_financial',
-            'jarvis_legal',
+          <InfoBlock title="MCP Server Stack" color={C.green100g} items={[
+            '@modelcontextprotocol/sdk ^1.12.1',
+            'dotenv ^17.3.1 (env loading)',
+            'zod ^3.24.2 (input validation)',
+            'Node.js native http (NOT fetch/undici)',
+            'launch.mjs wrapper for NSSM service',
+            'TIMEOUT_MS = 60s (QUBO can take ~31s)',
+            'MAX_RETRIES = 2 (1s, 2s exponential backoff)',
           ]} />
           <InfoBlock title="Monitoring" color={C.orange} items={[
             'Prometheus metrics: /metrics endpoint',
@@ -476,6 +681,7 @@ export function MemoryView() {
             'Circuit breakers per retrieval source',
             'Rate limiting: 30 req/min token bucket',
             'Request tracing via X-Request-ID',
+            'Backpressure: 50 max concurrent, shed at 80%',
           ]} />
           <InfoBlock title="Security" color={C.red} items={[
             'Bearer token auth (mandatory)',
@@ -483,37 +689,52 @@ export function MemoryView() {
             'Firewall rules per port per machine',
             'Tailscale mesh networking',
             'NSSM auto-restart on crash',
+            'X-Machine-ID header on writes',
           ]} />
         </div>
       </Phase>
 
-      {/* ── Benefits Summary ──────────────────────────────── */}
+      {/* ── Codebase Map ─────────────────────────────────── */}
+      <Phase label="Codebase Map" color="#94a3b8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <InfoBlock title="jarvis-memory-mcp (Node.js MCP)" color={C.blue} items={[
+            'src/index.ts — Main server (stdio + SSE transport)',
+            'src/services/memory-api.ts — HTTP client to optimizer',
+            'src/tools/optimize.ts — memory_optimize, rag_optimize, rag_context, optimize_chunks',
+            'src/tools/recall.ts — memory_recall_interrupt, memory_update_bitmask',
+            'src/tools/write.ts — memory_write',
+            'src/tools/health.ts — memory_health',
+            'launch.mjs — NSSM service wrapper',
+          ]} />
+          <InfoBlock title="jarvis-memory-api (CF Worker)" color={C.teal} items={[
+            'src/index.ts — REST API routes (context, cluster, locks, logs, tasks)',
+            'src/types.ts — TypeScript schemas',
+            'wrangler.toml — Cloudflare Worker config',
+            'Deployed: jarvis-memory-api.kaycha-labs.workers.dev',
+            'DB: Supabase (jarvis_memory schema)',
+            'Tables: context_store, cluster_state, file_locks, agent_logs, task_specs, task_feedback',
+          ]} />
+        </div>
+      </Phase>
+
+      {/* ── Roadmap ──────────────────────────────────────── */}
       <div className="rounded-xl border p-5" style={{ borderColor: C.accent + '30', background: C.accent + '05' }}>
-        <div className="text-[12px] font-semibold mb-3" style={{ color: C.accent }}>WHY JARVIS MEMORY</div>
+        <div className="text-[12px] font-semibold mb-3" style={{ color: C.accent }}>ROADMAP (From CML-MIC Benchmark)</div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <InfoBlock title="For the CEO (James)" color={C.accent} items={[
-            'True cross-session recall across all workstations',
-            'Domain-aware: compliance vs coding vs NodePlus',
-            'Structured financial contradiction detection',
-            'Session handoffs preserve decisions and context',
-            'Board-ready: auditable feedback loop + weight tuning',
+          <InfoBlock title="P0 — Critical" color={C.red} items={[
+            'Contradiction detection: adopt CR-01 pair matching from CML-MIC',
+            'Prevents serving conflicting context silently',
           ]} />
-          <InfoBlock title="For the Codebase" color={C.green100g} items={[
-            'QUBO-optimized chunk selection (not naive top-k)',
-            '7-term energy function balances relevance, freshness, budget',
-            'Entity graph captures code dependencies and patterns',
-            'Vectorized similarity (100x faster than Python loops)',
-            'Hybrid SA+Tabu solver with warm-start caching',
+          <InfoBlock title="P1 — High" color={C.orange} items={[
+            'Claim lifecycle states: active/superseded/archived',
+            'Structured extraction via LLM (replace regex with qwen3.5-35B)',
+            'Higher recall on decision extraction',
           ]} />
-          <InfoBlock title="vs Generic RAG" color={C.orange} items={[
-            'Domain-specific retrieval weights (not one-size-fits-all)',
-            'Feedback loop learns which chunks are useful',
-            'Entity graph enables structured queries',
-            'Contradiction detection prevents conflicting context',
-            'Session continuity tracks what was tried and failed',
-            'Sisyphus: predicts future needs via Bellman TD(λ)',
-            'Surprise detector: pushes context, agent never polls',
-            'Delta-only recall: never re-fetches loaded chunks',
+          <InfoBlock title="P2 — Medium" color={C.blue} items={[
+            'Provenance chain: session -> transcript -> evidence',
+            'Dashboard for human conflict resolution',
+            'Cross-project promotion workflow',
+            'Hybrid architecture: CML-MIC write path + JARVIS read path',
           ]} />
         </div>
       </div>
