@@ -8,12 +8,16 @@ import { MemoryView } from './views/MemoryView'
 import { RagView } from './views/RagView'
 import { LLMModelsView } from './views/LLMModelsView'
 import { SoftwareView } from './views/SoftwareView'
+import { LocationsView } from './views/LocationsView'
+import { BackupView } from './views/BackupView'
 
 import { FooterStats } from './components/FooterStats'
 
-type Tab = 'physical' | 'logical' | 'power' | 'pipeline' | 'testing' | 'memory' | 'rag' | 'llm-models' | 'software'
+type Tab = 'locations' | 'backup' | 'physical' | 'logical' | 'power' | 'pipeline' | 'testing' | 'memory' | 'rag' | 'llm-models' | 'software'
 
 const tabs: { id: Tab; label: string; icon: string }[] = [
+  { id: 'locations', label: 'Locations', icon: '◉' },
+  { id: 'backup', label: 'Backup', icon: '◫' },
   { id: 'physical', label: 'Physical', icon: '⬡' },
   { id: 'logical', label: 'Logical', icon: '◈' },
   { id: 'power', label: 'Power', icon: '⚡' },
@@ -26,7 +30,7 @@ const tabs: { id: Tab; label: string; icon: string }[] = [
 ]
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('physical')
+  const [activeTab, setActiveTab] = useState<Tab>('locations')
 
   return (
     <div className="min-h-screen flex flex-col" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
@@ -36,8 +40,8 @@ export default function App() {
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded bg-gradient-to-br from-accent to-green100g flex items-center justify-center text-bg font-bold text-sm">K</div>
             <div>
-              <h1 className="text-sm font-semibold text-textBright tracking-wide">AI LAB NETWORK</h1>
-              <p className="text-[10px] text-textDim tracking-widest uppercase">Kaycha Infrastructure</p>
+              <h1 className="text-sm font-semibold text-textBright tracking-wide">KAYCHA NETWORK</h1>
+              <p className="text-[10px] text-textDim tracking-widest uppercase">Infrastructure & Backup Operations</p>
             </div>
           </div>
           <nav className="flex gap-1">
@@ -62,6 +66,8 @@ export default function App() {
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
         <div className="px-6 py-6">
+          {activeTab === 'locations' && <LocationsView />}
+          {activeTab === 'backup' && <BackupView />}
           {activeTab === 'physical' && <PhysicalView />}
           {activeTab === 'logical' && <LogicalView />}
           {activeTab === 'power' && <PowerView />}
