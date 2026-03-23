@@ -5,6 +5,8 @@ import {
   MCP_SERVERS,
   SKILLS,
   SOFTWARE_STATS,
+  CHROME_EXTENSIONS,
+  VERSION_DRIFT,
 } from '../data/software-inventory'
 import type {
   WorkstationSoftware,
@@ -12,11 +14,13 @@ import type {
   SoftwareEntry,
   MCPServer,
   Skill,
+  ChromeExtension,
+  VersionDrift,
 } from '../data/software-inventory'
 
 /* ── Section type ───────────────────────────────────────── */
 
-type Section = 'workstations' | 'mcp' | 'skills'
+type Section = 'workstations' | 'mcp' | 'skills' | 'extensions' | 'drift'
 
 /* ── Sub-components ─────────────────────────────────────── */
 
@@ -115,6 +119,7 @@ function WorkstationCard({ ws }: { ws: WorkstationSoftware }) {
           <div className="text-[10px] font-mono" style={{ color: C.textDim }}>
             <span style={{ color: C.purple }}>{ws.gpu}</span> · <span style={{ color: C.accent }}>{ws.ram}</span>
           </div>
+          <div className="text-[9px] font-mono mt-0.5" style={{ color: C.textDim }}>{ws.cpu}</div>
         </div>
       </div>
       {/* Categories */}
@@ -199,6 +204,79 @@ function SkillCard({ skill }: { skill: Skill }) {
   )
 }
 
+/* ── Chrome Extension card ─────────────────────────────── */
+
+function ExtensionCard({ ext }: { ext: ChromeExtension }) {
+  const allMachines = WORKSTATIONS_SOFTWARE.map(w => w.name)
+  const isFleetWide = ext.machines.length === allMachines.length
+  return (
+    <div className="rounded-lg border p-4" style={{ background: C.panel, borderColor: 'rgba(255,255,255,0.06)' }}>
+      <div className="flex items-start gap-3">
+        <div className="w-8 h-8 rounded flex items-center justify-center text-[11px] shrink-0" style={{ background: C.cyan10g + '15', color: C.cyan10g, border: `1px solid ${C.cyan10g}30` }}>
+          ext
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[12px] font-bold" style={{ color: C.textBright }}>{ext.name}</span>
+            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-mono" style={{ background: 'rgba(255,255,255,0.04)', color: C.textDim }}>v{ext.version}</span>
+            {isFleetWide && (
+              <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold" style={{ background: C.green100g + '15', color: C.green100g }}>All machines</span>
+            )}
+          </div>
+          {!isFleetWide && (
+            <div className="flex gap-1 mt-1.5 flex-wrap">
+              {allMachines.map(m => {
+                const has = ext.machines.includes(m)
+                const ws = WORKSTATIONS_SOFTWARE.find(w => w.name === m)
+                return (
+                  <span key={m} className="text-[9px] px-1.5 py-0.5 rounded font-mono" style={{ background: has ? (ws?.color ?? C.textDim) + '15' : 'transparent', color: has ? (ws?.color ?? C.textDim) : C.textDim + '40', border: `1px solid ${has ? (ws?.color ?? C.textDim) + '30' : 'rgba(255,255,255,0.04)'}` }}>
+                    {m}
+                  </span>
+                )
+              })}
+            </div>
+          )}
+          <div className="text-[9px] mt-1 font-mono" style={{ color: C.textDim + '80' }}>{ext.id}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ── Version Drift row ─────────────────────────────────── */
+
+function DriftRow({ drift }: { drift: VersionDrift }) {
+  const uniqueVersions = [...new Set(drift.versions.map(v => v.version))]
+  const latestVersion = drift.versions.reduce((a, b) => a.version > b.version ? a : b).version
+  return (
+    <div className="rounded-lg border p-4" style={{ background: C.panel, borderColor: C.warning + '20' }}>
+      <div className="flex items-start gap-3">
+        <div className="w-8 h-8 rounded flex items-center justify-center text-[11px] shrink-0" style={{ background: C.warning + '15', color: C.warning, border: `1px solid ${C.warning}30` }}>
+          !!
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[12px] font-bold" style={{ color: C.textBright }}>{drift.software}</span>
+            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold" style={{ background: C.warning + '15', color: C.warning }}>{uniqueVersions.length} versions</span>
+          </div>
+          <div className="flex gap-2 mt-2 flex-wrap">
+            {drift.versions.map(v => {
+              const ws = WORKSTATIONS_SOFTWARE.find(w => w.name === v.hostname)
+              const isOutdated = v.version !== latestVersion
+              return (
+                <div key={v.hostname} className="text-[10px] px-2 py-1 rounded font-mono" style={{ background: isOutdated ? C.red + '10' : C.green100g + '10', color: isOutdated ? C.red : C.green100g, border: `1px solid ${isOutdated ? C.red + '25' : C.green100g + '25'}` }}>
+                  <span style={{ color: ws?.color ?? C.textDim }}>{v.hostname}</span>
+                  <span className="ml-1.5">{v.version}</span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ── Matrix table ───────────────────────────────────────── */
 
 function FleetMatrix() {
@@ -206,9 +284,12 @@ function FleetMatrix() {
     'Docker', 'Tailscale', 'Parsec', 'Sunshine', 'Moonlight',
     'Node.js', 'Python', 'GitHub CLI', 'Chrome', 'windows_exporter',
     'CUDA Toolkit', 'Ollama', 'PostgreSQL', 'cloudflared', 'PowerShell',
-    'VS Code', 'Visual Studio Build Tools', 'Barrier', 'WireGuard', 'Cursor', 'Claude Desktop',
-    '.NET SDK', 'Rustup', 'uv', 'FFmpeg', 'jq', 'NSSM', 'Wget', 'Git LFS',
+    'VS Code', 'Visual Studio Build Tools', 'Cursor', 'Claude Desktop',
+    '.NET SDK', 'Rustup', 'uv', 'FFmpeg', 'jq', 'NSSM', 'Wget',
+    'Claude Code', 'Windsurf', 'pnpm', 'Docker', 'WSL', 'OpenSSH',
   ]
+  // Deduplicate
+  const uniqueTools = [...new Set(coreTools)]
 
   const machines = WORKSTATIONS_SOFTWARE
 
@@ -230,7 +311,7 @@ function FleetMatrix() {
           </tr>
         </thead>
         <tbody>
-          {coreTools.map((tool, i) => (
+          {uniqueTools.map((tool, i) => (
             <tr key={tool} style={{ background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)' }}>
               <td className="px-3 py-1.5 font-medium" style={{ color: C.textBright }}>{tool}</td>
               {machines.map(ws => {
@@ -261,6 +342,12 @@ export function SoftwareView() {
   const filteredSkills = SKILLS.filter(s =>
     !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.description.toLowerCase().includes(search.toLowerCase())
   )
+  const filteredExtensions = CHROME_EXTENSIONS.filter(e =>
+    !search || e.name.toLowerCase().includes(search.toLowerCase()) || e.id.toLowerCase().includes(search.toLowerCase())
+  )
+  const filteredDrift = VERSION_DRIFT.filter(d =>
+    !search || d.software.toLowerCase().includes(search.toLowerCase())
+  )
 
   return (
     <div className="space-y-6">
@@ -270,6 +357,8 @@ export function SoftwareView() {
         <StatCard value={String(SOFTWARE_STATS.totalMCPServers)} label="MCP Servers" color={C.purple} />
         <StatCard value={String(SOFTWARE_STATS.totalMCPTools)} label="MCP Tools" color={C.green100g} />
         <StatCard value={String(SOFTWARE_STATS.totalSkills)} label="Skills" color={C.pink} />
+        <StatCard value={String(SOFTWARE_STATS.totalChromeExtensions)} label="Extensions" color={C.cyan10g} />
+        <StatCard value={String(SOFTWARE_STATS.totalVersionDrifts)} label="Version Drifts" color={C.warning} />
         <div className="ml-auto text-[10px] font-mono" style={{ color: C.textDim }}>
           Audit: {SOFTWARE_STATS.auditDate}
         </div>
@@ -280,6 +369,8 @@ export function SoftwareView() {
         <SectionTab active={section === 'workstations'} label="Workstations" icon="⬡" count={SOFTWARE_STATS.totalWorkstations} onClick={() => setSection('workstations')} />
         <SectionTab active={section === 'mcp'} label="MCP Servers" icon="◈" count={SOFTWARE_STATS.totalMCPServers} onClick={() => setSection('mcp')} />
         <SectionTab active={section === 'skills'} label="Skills" icon="⚡" count={SOFTWARE_STATS.totalSkills} onClick={() => setSection('skills')} />
+        <SectionTab active={section === 'extensions'} label="Chrome Extensions" icon="🧩" count={SOFTWARE_STATS.totalChromeExtensions} onClick={() => setSection('extensions')} />
+        <SectionTab active={section === 'drift'} label="Version Drift" icon="⚠" count={SOFTWARE_STATS.totalVersionDrifts} onClick={() => setSection('drift')} />
         <div className="ml-auto">
           <input
             type="text"
@@ -333,6 +424,34 @@ export function SoftwareView() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {filteredSkills.map(skill => (
               <SkillCard key={skill.name} skill={skill} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Chrome Extensions section */}
+      {section === 'extensions' && (
+        <div className="space-y-3">
+          <div className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: C.textDim }}>
+            {filteredExtensions.length} Chrome Extension{filteredExtensions.length !== 1 ? 's' : ''} — synced across fleet via Chrome profile
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {filteredExtensions.map(ext => (
+              <ExtensionCard key={ext.id} ext={ext} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Version Drift section */}
+      {section === 'drift' && (
+        <div className="space-y-3">
+          <div className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: C.textDim }}>
+            {filteredDrift.length} software package{filteredDrift.length !== 1 ? 's' : ''} with version mismatches across machines — scanned 2026-03-23
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            {filteredDrift.map(drift => (
+              <DriftRow key={drift.software} drift={drift} />
             ))}
           </div>
         </div>
