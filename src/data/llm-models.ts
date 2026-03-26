@@ -39,8 +39,8 @@ export interface Workstation {
 export const WORKSTATIONS: Workstation[] = [
   { id: 'jericho', name: 'Jericho', ip: '192.168.1.39', gpu: 'RTX PRO 6000', vramTotal: '96 GB', role: 'Primary Inference / Dev', colorKey: 'accent' },
   { id: 'sentinel', name: 'Sentinel', ip: '192.168.1.40', gpu: 'RTX 5090', vramTotal: '32 GB', role: 'Memory Optimizer / SMS Pipeline', colorKey: 'green100g' },
-  { id: 'iron-patriot', name: 'Iron-Patriot', ip: '192.168.1.42', gpu: 'RTX 4090', vramTotal: '24 GB', role: 'Backup Optimizer / Inference', colorKey: 'purple' },
-  { id: 'ironman', name: 'Ironman', ip: '192.168.1.43', gpu: 'RTX 4090', vramTotal: '24 GB', role: 'Inference / Training', colorKey: 'warning' },
+  { id: 'iron-patriot', name: 'Iron-Patriot', ip: '192.168.1.42', gpu: 'RTX PRO 6000', vramTotal: '96 GB', role: 'Docker / Monitoring / jarvis-rag', colorKey: 'purple' },
+  { id: 'ironman', name: 'Ironman', ip: '192.168.1.43', gpu: '2× RTX PRO 6000 (NVLink)', vramTotal: '192 GB', role: 'Flagship Inference (TR PRO 9995WX)', colorKey: 'warning' },
 ]
 
 export const LLM_MODELS: LLMModel[] = [
@@ -400,5 +400,5 @@ export const MODEL_STATS = {
   customModels: LLM_MODELS.filter(m => m.type === 'custom').length,
   totalStoragePerHost: '~550 GB',
   workstationCount: WORKSTATIONS.length,
-  lastSynced: '2026-03-17',
+  lastSynced: '2026-03-26',
 }

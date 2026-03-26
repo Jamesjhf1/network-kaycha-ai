@@ -258,7 +258,7 @@ const estimatedTotalTests = totalSpecFiles * 5
 /* ── Export ────────────────────────────────────────────────── */
 
 export const TESTING_STATS: TestSummary = {
-  lastUpdated: '2026-03-14T00:00:00Z',
+  lastUpdated: '2026-03-26T00:00:00Z',
   totals: {
     specFiles: 159,         // Verified count from kaycha-tests
     tests: 750,             // Approximate from reporter output

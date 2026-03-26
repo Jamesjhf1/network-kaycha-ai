@@ -394,5 +394,5 @@ export const SOFTWARE_STATS = {
   totalWorkstations: WORKSTATIONS_SOFTWARE.length,
   totalChromeExtensions: CHROME_EXTENSIONS.length,
   totalVersionDrifts: VERSION_DRIFT.length,
-  auditDate: '2026-03-23',
+  auditDate: '2026-03-26',
 }

@@ -56,7 +56,7 @@ export const NODES: Record<string, NodeData> = {
     colorKey: 'warning',
     siteId: 'boca-lab',
     hardware: [
-      'CPU: AMD Threadripper PRO 9995WX — 64C/128T',
+      'CPU: AMD Threadripper PRO 9995WX — 96C/192T',
       'RAM: 256GB DDR5 ECC RDIMM (4×64GB)',
       'GPU: 2× RTX PRO 6000 Blackwell 96GB (192GB NVLink VRAM)',
       'SSD: 2× 4TB Samsung 990 PRO Gen4 NVMe',
@@ -76,7 +76,7 @@ export const NODES: Record<string, NodeData> = {
     interfaces: [
       { label: 'Marvell AQtion 10GBASE-T', speed: '10GbE', target: 'Netgear MS510TXUP Port 8', ip: '192.168.1.43', color: 'lan' },
       { label: 'Realtek 2.5GbE', speed: '2.5GbE', target: 'Netgear MS510TXUP', ip: '192.168.1.50', color: 'lan' },
-      { label: 'ConnectX-5 VPI', speed: '100GbE', target: 'Mellanox SN2100 AI Fabric', ip: 'Media disconnected', color: 'fabric' },
+      { label: 'ConnectX-5 VPI (Fabric)', speed: '100GbE', target: 'Mellanox SN2100 AI Fabric', ip: '10.100.0.3', color: 'fabric' },
       { label: 'Tailscale', speed: 'WireGuard', target: 'Mesh VPN overlay', ip: '100.97.196.3', color: 'tailscale' },
       { label: 'DP 2.1 (×2)', speed: 'DisplayPort 2.1', target: '2× Samsung G9 OLED', color: 'display' },
     ],
@@ -88,6 +88,7 @@ export const NODES: Record<string, NodeData> = {
     notes: [
       'NVLink bridge couples 2× 96GB GPUs → single 192GB VRAM pool',
       'Primary large-model inference: Qwen3.5-122B Q8 (~128GB VRAM)',
+      'Dual LAN: Marvell 10GbE (.43 DHCP) + Realtek 2.5GbE (.50 static, DNS→IP/IronPatriot)',
       'Future: Qwen3.5-397B Q4 (~200GB) when GGUF stable',
     ],
   },
@@ -121,6 +122,7 @@ export const NODES: Record<string, NodeData> = {
     ],
     interfaces: [
       { label: 'Realtek 2.5GbE', speed: '2.5GbE', target: 'Netgear MS510TXUP Port 5', ip: '192.168.1.40', color: 'lan' },
+      { label: 'ConnectX-5 VPI (Fabric)', speed: '100GbE', target: 'Mellanox SN2100 AI Fabric', ip: '10.100.0.4', color: 'fabric' },
       { label: 'Wi-Fi 6E (RZ616)', speed: 'Wi-Fi 6E', target: 'Wireless AP (backup)', color: 'lan' },
       { label: 'Tailscale', speed: 'WireGuard', target: 'Mesh VPN', ip: '100.98.251.57', color: 'tailscale' },
     ],
@@ -162,7 +164,7 @@ export const NODES: Record<string, NodeData> = {
     ],
     interfaces: [
       { label: 'Realtek 2.5GbE', speed: '2.5GbE', target: 'Netgear MS510TXUP Port 6', ip: '192.168.1.42', color: 'lan' },
-      { label: 'ConnectX-5 VPI', speed: '100GbE', target: 'Mellanox SN2100 AI Fabric', ip: 'Media disconnected', color: 'fabric' },
+      { label: 'ConnectX-5 VPI (Fabric)', speed: '100GbE', target: 'Mellanox SN2100 AI Fabric', ip: '10.100.0.2', color: 'fabric' },
       { label: 'Cloudflare WARP', speed: 'VPN', target: 'Cloudflare Zero Trust', ip: '172.16.0.2', color: 'wan' },
       { label: 'Tailscale', speed: 'WireGuard', target: 'Mesh VPN', ip: '100.75.25.51', color: 'tailscale' },
     ],
@@ -204,7 +206,7 @@ export const NODES: Record<string, NodeData> = {
     ],
     interfaces: [
       { label: 'Realtek 2.5GbE', speed: '2.5GbE', target: 'Netgear MS510TXUP Port 7', ip: '192.168.1.39', color: 'lan' },
-      { label: 'ConnectX-5 VPI', speed: '100GbE', target: 'Mellanox SN2100 AI Fabric', ip: 'Media disconnected', color: 'fabric' },
+      { label: 'ConnectX-5 VPI (Fabric)', speed: '100GbE', target: 'Mellanox SN2100 AI Fabric', ip: '10.100.0.1', color: 'fabric' },
       { label: 'Tailscale', speed: 'WireGuard', target: 'Mesh VPN', ip: '100.85.6.71', color: 'tailscale' },
     ],
     services: [
@@ -440,8 +442,8 @@ export const NODES: Record<string, NodeData> = {
     id: 'sn2100',
     name: 'SN2100',
     badge: '100GbE AI FABRIC',
-    status: 'building',
-    role: 'Mellanox SN2100 — 100GbE AI Fabric Switch (Not Yet Cabled)',
+    status: 'online',
+    role: 'Mellanox SN2100 — 100GbE AI Fabric Switch',
     colorKey: 'green100g',
     siteId: 'boca-lab',
     hardware: [
@@ -455,16 +457,16 @@ export const NODES: Record<string, NodeData> = {
     services: [],
     notes: [
       'Dedicated AI fabric — isolated from general LAN',
-      'Planned subnet: 10.0.100.0/24',
-      'All nodes have ConnectX-5 VPI NICs installed but media disconnected',
-      'Fabric not yet cabled — waiting for Ironman build completion',
-      'RoCEv2 will enable zero-copy model weight transfer between nodes',
+      'Subnet: 10.100.0.0/24',
+      'All 4 compute nodes connected and active via ConnectX-5 VPI NICs',
+      'RoCEv2 enabled — zero-copy model weight transfer between nodes',
     ],
     ports: [
-      { port: '1', speed: '100GbE', device: 'IRONMAN', notes: 'ConnectX-5 VPI — media disconnected, pending cabling' },
-      { port: '2', speed: '100GbE', device: 'IRON-PATRIOT', notes: 'ConnectX-5 VPI — media disconnected, pending cabling' },
-      { port: '3', speed: '100GbE', device: 'JERICHO', notes: 'ConnectX-5 VPI — media disconnected, pending cabling' },
-      { port: '4-16', speed: '100GbE', device: 'Spare', notes: 'Future nodes / expansion' },
+      { port: '1', speed: '100GbE', device: 'JERICHO (10.100.0.1)', notes: 'ConnectX-5 VPI — active' },
+      { port: '2', speed: '100GbE', device: 'IRON-PATRIOT (10.100.0.2)', notes: 'ConnectX-5 VPI — active' },
+      { port: '3', speed: '100GbE', device: 'IRONMAN (10.100.0.3)', notes: 'ConnectX-5 VPI — active' },
+      { port: '4', speed: '100GbE', device: 'SENTINEL (10.100.0.4)', notes: 'ConnectX-5 VPI — active' },
+      { port: '5-16', speed: '100GbE', device: 'Spare', notes: 'Future nodes / expansion' },
     ],
   },
 
