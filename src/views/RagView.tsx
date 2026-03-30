@@ -111,12 +111,12 @@ function CodeBlock({ children, color }: { children: React.ReactNode; color: stri
   )
 }
 
-/* ── Collection Status Data (live as of 2026-03-28) ──────── */
+/* ── Collection Status Data (live as of 2026-03-30) ──────── */
 
 const collections = [
   {
     name: 'jarvis_documents',
-    chunks: '175,820',
+    chunks: '688,924',
     chunkSize: '1024',
     overlap: '200',
     bm25: 'OK',
@@ -127,7 +127,7 @@ const collections = [
   },
   {
     name: 'jarvis_code',
-    chunks: '82,067',
+    chunks: '10,041',
     chunkSize: '768',
     overlap: '150',
     bm25: 'OK',
@@ -138,7 +138,7 @@ const collections = [
   },
   {
     name: 'jarvis_knowledge',
-    chunks: '56,348',
+    chunks: '310,472',
     chunkSize: '768',
     overlap: '150',
     bm25: 'OK',
@@ -149,7 +149,7 @@ const collections = [
   },
   {
     name: 'jarvis_legal',
-    chunks: '28,223',
+    chunks: '22,308',
     chunkSize: '1536',
     overlap: '300',
     bm25: 'OK',
@@ -160,7 +160,7 @@ const collections = [
   },
   {
     name: 'jarvis_regulations',
-    chunks: '87',
+    chunks: '1,052',
     chunkSize: '1536',
     overlap: '300',
     bm25: 'OK',
@@ -182,13 +182,13 @@ const collections = [
   },
   {
     name: 'jarvis_financial',
-    chunks: '0',
+    chunks: '606',
     chunkSize: '1024',
     overlap: '100',
     bm25: 'OK',
     minScore: '0.28',
-    status: 'needs_reingest' as const,
-    note: 'Sales, AR aging, TAT metrics, corporate metrics — daily 3:30 AM ingest (SUPABASE_SERVICE_KEY required)',
+    status: 'ok' as const,
+    note: 'Sales, AR aging, TAT metrics, corporate metrics — daily 3:30 AM ingest',
     source: 'KaychaExec Supabase: exec_sales_monthly_company, daily_sales, ar_aging, daily_tat, corporate_metrics',
   },
 ]
@@ -232,7 +232,7 @@ export function RagView() {
 
       {/* Stats Bar */}
       <div className="flex gap-3 flex-wrap justify-center">
-        <StatCard value="342K" label="Total Chunks" color={C.accent} />
+        <StatCard value="1.03M" label="Total Chunks" color={C.accent} />
         <StatCard value="7" label="Collections" color={C.teal} />
         <StatCard value="1024d" label="Embed Dim" color={C.purple} />
         <StatCard value="Hybrid" label="Vec+BM25+HyDE" color={C.green100g} />
@@ -475,7 +475,7 @@ export function RagView() {
       <Arrow />
 
       {/* ── 7 Collections ─────────────────────────────────── */}
-      <Phase label="7 ChromaDB Collections — Live Status (March 29, 2026)" color="#2dd4bf">
+      <Phase label="7 ChromaDB Collections — Live Status (March 30, 2026)" color="#2dd4bf">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {collections.map((col) => (
             <div
@@ -529,7 +529,7 @@ export function RagView() {
           ))}
         </div>
         <div className="mt-3 text-[10px] text-center" style={{ color: C.textDim }}>
-          Total: <span style={{ color: C.textBright }}>342,604 chunks</span> across 7 collections.
+          Total: <span style={{ color: C.textBright }}>1,033,462 chunks</span> across 7 collections.
           Collection min_score thresholds tuned per collection in config.py.
           jarvis_financial at 0 chunks — daily ingest 3:30 AM (SUPABASE_SERVICE_KEY required).
         </div>
@@ -852,7 +852,7 @@ export function RagView() {
           </div>
           <div>
             <span style={{ color: '#c4b5fd' }}>11. Return</span>
-            {' \u2192 context block injected into Claude prompt (grounded in 342K chunks)'}
+            {' \u2192 context block injected into Claude prompt (grounded in 1.03M chunks)'}
           </div>
         </div>
 
